@@ -26,9 +26,12 @@ export type Profile = {
     jerseyNumber: string
     startedIn: string
   }
-  sport: { medals: number; highlights: string[] }
+  sport: { medals: number; highlights: SportHighlight[] }
   gaming: { game: string; shortName: string; platform: string; level: number; profileUrl: string }
 }
+
+export type SportIcon = 'volleyball' | 'medal' | 'compass' | 'math'
+export type SportHighlight = { label: string; icon: SportIcon; text: string }
 
 // ---------- Projects ----------
 
@@ -38,6 +41,7 @@ export type ProjectContext = 'internship' | 'university' | 'team' | 'personal'
 type ProjectBase = {
   slug: string // used in the URL: /projects/<slug>
   title: string
+  shortTitle: string // for small tags, e.g. "Hotel Commerce"
   tagline: string // one sentence on the card
   status: ProjectStatus
   context: ProjectContext
@@ -108,8 +112,18 @@ export type Certificate = {
 // points at it (slugs from projects.ts); `detail` says what exactly was done or how much.
 export type Skill = { name: string; detail?: string; evidence?: string[] }
 
+// Each group has its own muted color so the cards are easy to tell apart (--color-tone-* tokens)
+export type SkillColor =
+  'cyan' | 'amber' | 'coral' | 'sand' | 'sage' | 'lavender' | 'slate' | 'rose'
+
 // `main` groups start open; the others start as thin cards you can click open
-export type SkillGroup = { title: string; main?: boolean; skills: Skill[] }
+export type SkillGroup = {
+  title: string
+  summary: string // one line: what this group is for
+  color: SkillColor
+  main?: boolean
+  skills: Skill[]
+}
 
 // ---------- Quest (the 5 "sets" of the story) ----------
 

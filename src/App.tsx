@@ -1,11 +1,9 @@
 import { domAnimation, LazyMotion, MotionConfig } from 'motion/react'
+import { RouterProvider } from 'react-router'
 
-import { Backdrop } from '@/components/Backdrop'
-import { Landing } from '@/features/landing/Landing'
-import { PortfolioPage } from '@/features/portfolio/PortfolioPage'
+import { router } from '@/app/router'
 
-// For now: the landing screen, then the portfolio below it.
-// Milestone 5 replaces this with the quest state machine (landing → sets → spike → portfolio).
+// Pages and URLs live in app/router.tsx; this file only adds the app-wide providers.
 function App() {
   return (
     // LazyMotion + `m.` components load only the animation features we use (smaller bundle);
@@ -13,9 +11,7 @@ function App() {
     <LazyMotion features={domAnimation} strict>
       {/* reducedMotion="user": if the visitor's system asks for less motion, skip movement */}
       <MotionConfig reducedMotion="user">
-        <Backdrop />
-        <Landing />
-        <PortfolioPage />
+        <RouterProvider router={router} />
       </MotionConfig>
     </LazyMotion>
   )

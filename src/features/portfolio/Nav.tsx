@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
 
 import { ButtonLink } from '@/components/ui/ButtonLink'
 import { profile } from '@/data/profile'
 
+// Sections of the home page. Links go to "/#section", so they also work from a project page:
+// the router returns to "/" without reloading, and ScrollRestoration scrolls to the section.
 const LINKS = [
-  { href: '#projects', label: 'Projects' },
-  { href: '#skills', label: 'Skills' },
-  { href: '#experience', label: 'Experience' },
-  { href: '#education', label: 'Education' },
-  { href: '#sport', label: 'Sport' },
-  { href: '#contact', label: 'Contact' },
+  { hash: 'projects', label: 'Projects' },
+  { hash: 'skills', label: 'Skills' },
+  { hash: 'experience', label: 'Experience' },
+  { hash: 'education', label: 'Education' },
+  { hash: 'sport', label: 'Sport' },
+  { hash: 'contact', label: 'Contact' },
 ]
 
 // Sticky top bar. On small screens the links fold into a menu button.
@@ -30,20 +33,25 @@ export function Nav() {
         aria-label="Main"
         className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6"
       >
-        <a href="#about" className="font-display text-2xl font-black tracking-tight uppercase">
+        <Link
+          to={{ pathname: '/', hash: 'about' }}
+          viewTransition
+          className="font-display text-2xl font-black tracking-tight uppercase"
+        >
           MK<span className="text-accent">·{profile.volleyball.jerseyNumber}</span>
           <span className="sr-only"> — {profile.name}, back to the start of the portfolio</span>
-        </a>
+        </Link>
 
         <ul className="hidden items-center gap-6 md:flex">
           {LINKS.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
+            <li key={link.hash}>
+              <Link
+                to={{ pathname: '/', hash: link.hash }}
+                viewTransition
                 className="font-mono text-xs tracking-[0.2em] text-light/70 uppercase transition-colors hover:text-accent"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
@@ -69,14 +77,15 @@ export function Nav() {
         <div id="mobile-menu" className="border-t border-light/10 md:hidden">
           <ul className="mx-auto max-w-6xl space-y-1 px-4 py-4">
             {LINKS.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
+              <li key={link.hash}>
+                <Link
+                  to={{ pathname: '/', hash: link.hash }}
+                  viewTransition
                   onClick={() => setOpen(false)}
                   className="block py-3 font-display text-3xl font-extrabold uppercase hover:text-accent"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
             <li className="pt-3">

@@ -45,7 +45,7 @@ export function Backdrop() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 -z-10 animate-backdrop-in overflow-hidden"
+      className="pointer-events-none fixed inset-0 -z-10 animate-backdrop-in overflow-hidden [view-transition-name:backdrop]"
     >
       <m.svg
         style={{ y }}

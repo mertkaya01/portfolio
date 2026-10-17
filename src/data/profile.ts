@@ -36,10 +36,26 @@ export const profile: Profile = {
   sport: {
     medals: 16,
     highlights: [
-      'Nine seasons of competitive volleyball — today an outside hitter, #9.',
-      'Volleyball and athletics throughout high school, with medals at inter-high-school tournaments.',
-      'Medals in orienteering and athletics, including short-distance running.',
-      'Medals in math competitions too, including olympiad-style contests.',
+      {
+        label: 'Volleyball',
+        icon: 'volleyball',
+        text: 'Nine seasons of competitive volleyball — today an outside hitter, #9.',
+      },
+      {
+        label: 'High school',
+        icon: 'medal',
+        text: 'Volleyball and athletics throughout high school, with medals at inter-high-school tournaments.',
+      },
+      {
+        label: 'Orienteering & athletics',
+        icon: 'compass',
+        text: 'Medals in orienteering and athletics, including short-distance running.',
+      },
+      {
+        label: 'Math competitions',
+        icon: 'math',
+        text: 'Medals in math competitions too, including olympiad-style contests.',
+      },
     ],
   },
   gaming: {

@@ -11,6 +11,7 @@ export const projects: Project[] = [
   // ───────────────────────────── Featured ─────────────────────────────
   {
     slug: 'hotel-commerce-service',
+    shortTitle: 'Hotel Commerce',
     featured: true,
     title: 'Hotel Commerce Service',
     tagline: 'Full-stack hotel search and booking platform built on a real hotel dataset.',
@@ -83,6 +84,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'hotel-ai-concierge',
+    shortTitle: 'AI Concierge',
     featured: true,
     title: 'Hotel AI Concierge',
     tagline:
@@ -142,6 +144,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'exam-verification-engine',
+    shortTitle: 'Exam Engine',
     featured: true,
     title: 'Exam Layout Verification Engine',
     tagline:
@@ -201,6 +204,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'marketplace',
+    shortTitle: 'Marketplace',
     featured: true,
     title: 'Marketplace',
     tagline:
@@ -258,6 +262,7 @@ export const projects: Project[] = [
   // ───────────────────────────── More projects ─────────────────────────────
   {
     slug: 'uptime-monitor',
+    shortTitle: 'Uptime Monitor',
     featured: false,
     title: 'Uptime Monitor',
     tagline:
@@ -271,6 +276,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'hotel-whatsapp-bot',
+    shortTitle: 'Hotel Bot',
     featured: false,
     title: 'Hotel Reservation WhatsApp Bot',
     tagline:
@@ -284,6 +290,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'zenith-whatsapp-bot',
+    shortTitle: 'Zenith Bot',
     featured: false,
     title: 'Zenith — WhatsApp Command Bot',
     tagline:
@@ -297,6 +304,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'weather-currency-bot',
+    shortTitle: 'Weather Bot',
     featured: false,
     title: 'Weather & Currency WhatsApp Bot',
     tagline:
@@ -312,6 +320,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'capstone-secure-network',
+    shortTitle: 'Capstone',
     featured: false,
     title: 'Cyber-Secure Network for a Small Company',
     tagline:
@@ -334,6 +343,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'linguatype',
+    shortTitle: 'LinguaType',
     featured: false,
     title: 'LinguaType',
     tagline: 'Monkeytype-style typing test that doubles as a bilingual EN ↔ TR vocabulary trainer.',
@@ -346,6 +356,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'data-analysis-engine',
+    shortTitle: 'Data Engine',
     featured: false,
     title: 'Dynamic Data Analysis Engine',
     tagline:

@@ -1,30 +1,14 @@
+import { Link } from 'react-router'
+
 import { ButtonLink } from '@/components/ui/ButtonLink'
-import { Chip } from '@/components/ui/Chip'
 import { Reveal } from '@/components/ui/Reveal'
 import { Section } from '@/components/ui/Section'
 import { TiltCard } from '@/components/ui/TiltCard'
 import { projects } from '@/data/projects'
+import { CONTEXT_LABEL, projectPath } from '@/features/projects/labels'
+import { Badges, Stack } from '@/features/projects/ProjectBits'
 import { isRealLink } from '@/lib/todo'
-import type {
-  CompactProject,
-  FeaturedProject,
-  Project,
-  ProjectContext,
-  ProjectStatus,
-} from '@/types/content'
-
-const CONTEXT_LABEL: Record<ProjectContext, string> = {
-  internship: 'Internship',
-  university: 'University',
-  team: 'Team project',
-  personal: 'Personal',
-}
-
-const STATUS_LABEL: Record<ProjectStatus, string> = {
-  completed: 'Completed',
-  'in-progress': 'In progress',
-  prototype: 'Prototype',
-}
+import type { CompactProject, FeaturedProject } from '@/types/content'
 
 const STACK_ON_CARD = 6 // show this many technologies, then "+N"
 
@@ -101,8 +85,8 @@ function FeaturedCard({ project }: { project: FeaturedProject }) {
           </div>
         </dl>
 
-        <div className="translate-z-4">
-          <Stack items={project.stack} />
+        <div className="mt-6 translate-z-4">
+          <Stack items={project.stack} max={STACK_ON_CARD} />
         </div>
 
         <div className="mt-auto translate-z-8 pt-8">
@@ -117,9 +101,13 @@ function FeaturedCard({ project }: { project: FeaturedProject }) {
                 Live demo
               </ButtonLink>
             )}
-            <span className="ml-auto font-mono text-[0.65rem] tracking-[0.2em] text-muted uppercase">
-              Case study · soon
-            </span>
+            <Link
+              to={projectPath(project.slug)}
+              viewTransition
+              className="ml-auto rounded-full bg-accent px-4 py-2 font-mono text-[0.7rem] font-semibold tracking-[0.15em] text-night uppercase transition-colors hover:bg-light"
+            >
+              Case study →<span className="sr-only">: {project.title}</span>
+            </Link>
           </div>
           {isRealLink(links.demo) && links.demoNote && (
             <p className="mt-3 text-xs text-muted">{links.demoNote}</p>
@@ -132,7 +120,6 @@ function FeaturedCard({ project }: { project: FeaturedProject }) {
 
 function CompactCard({ project }: { project: CompactProject }) {
   const { links } = project
-  const hasLinks = [links.repo, links.demo, links.paper].some(isRealLink)
 
   return (
     <TiltCard maxTilt={6}>
@@ -149,10 +136,10 @@ function CompactCard({ project }: { project: CompactProject }) {
         <p className="mt-2 translate-z-6 text-sm leading-relaxed text-light/70">
           {project.tagline}
         </p>
-        <div className="translate-z-4">
+        <div className="mt-6 translate-z-4">
           <Stack items={project.stack} max={4} />
         </div>
-        <div className="mt-auto flex translate-z-6 flex-wrap gap-x-5 gap-y-2 pt-5">
+        <div className="mt-auto flex translate-z-6 flex-wrap items-center gap-x-5 gap-y-2 pt-5">
           {isRealLink(links.repo) && (
             <ButtonLink href={links.repo} variant="link">
               Code
@@ -168,43 +155,15 @@ function CompactCard({ project }: { project: CompactProject }) {
               Paper
             </ButtonLink>
           )}
-          {!hasLinks && <span className="font-mono text-xs text-muted">Code not public</span>}
+          <Link
+            to={projectPath(project.slug)}
+            viewTransition
+            className="ml-auto font-mono text-[0.7rem] font-semibold tracking-[0.15em] text-light/80 uppercase transition-colors hover:text-accent"
+          >
+            Details →<span className="sr-only">: {project.title}</span>
+          </Link>
         </div>
       </article>
     </TiltCard>
-  )
-}
-
-function Badges({ project }: { project: Project }) {
-  return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Chip tone="wood">{CONTEXT_LABEL[project.context]}</Chip>
-      <Chip tone={project.status === 'completed' ? 'accent' : 'muted'}>
-        {STATUS_LABEL[project.status]}
-      </Chip>
-      <span className="font-mono text-[0.65rem] tracking-[0.2em] text-muted uppercase">
-        {project.period}
-      </span>
-    </div>
-  )
-}
-
-function Stack({ items, max = STACK_ON_CARD }: { items: string[]; max?: number }) {
-  const shown = items.slice(0, max)
-  const hidden = items.length - shown.length
-
-  return (
-    <ul className="mt-6 flex flex-wrap gap-1.5" aria-label="Technologies">
-      {shown.map((item) => (
-        <li key={item}>
-          <Chip>{item}</Chip>
-        </li>
-      ))}
-      {hidden > 0 && (
-        <li>
-          <Chip>+{hidden}</Chip>
-        </li>
-      )}
-    </ul>
   )
 }

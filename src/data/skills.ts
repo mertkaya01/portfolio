@@ -2,10 +2,12 @@ import type { SkillGroup } from '../types/content.ts'
 
 // Grouped by area. `evidence` links a skill to the projects where it was used;
 // `detail` says what exactly — or how far (e.g. "beginner level", from the CV).
-// The three `main` groups are open on page load; the rest are thin cards you click open.
+// The three `main` groups are the core stack: they come first and are marked "Core".
 export const skillGroups: SkillGroup[] = [
   {
     title: 'Backend',
+    summary: 'REST APIs, security and data access — mostly Java and Spring Boot.',
+    color: 'cyan',
     main: true,
     skills: [
       { name: 'Java', evidence: ['hotel-commerce-service', 'marketplace', 'uptime-monitor'] },
@@ -24,6 +26,8 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     title: 'Frontend',
+    summary: 'Single-page apps in Angular and React, written in TypeScript.',
+    color: 'amber',
     main: true,
     skills: [
       {
@@ -38,6 +42,8 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     title: 'AI & Computer Vision',
+    summary: 'Computer vision in Python and LLM agents that call real APIs.',
+    color: 'coral',
     main: true,
     skills: [
       { name: 'Python', evidence: ['exam-verification-engine', 'data-analysis-engine'] },
@@ -47,6 +53,8 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     title: 'Data & Search',
+    summary: 'Full-text search and relational databases.',
+    color: 'sand',
     skills: [
       { name: 'Apache Solr', evidence: ['hotel-commerce-service'] },
       {
@@ -57,17 +65,9 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
   {
-    title: 'DevOps & Testing',
-    skills: [
-      { name: 'Docker', evidence: ['hotel-commerce-service'] },
-      { name: 'GitHub Actions', evidence: ['hotel-commerce-service'] },
-      { name: 'Vercel · Render', evidence: ['hotel-commerce-service'] },
-      { name: 'JUnit 5 · Mockito', evidence: ['hotel-commerce-service'] },
-      { name: 'Vitest', evidence: ['hotel-commerce-service', 'linguatype'] },
-    ],
-  },
-  {
     title: 'Networking & Security',
+    summary: 'A segmented, monitored corporate network — my graduation project.',
+    color: 'lavender',
     skills: [
       {
         name: 'Network segmentation',
@@ -102,7 +102,21 @@ export const skillGroups: SkillGroup[] = [
     ],
   },
   {
+    title: 'DevOps & Testing',
+    summary: 'Containers, CI pipelines, deployments and automated tests.',
+    color: 'sage',
+    skills: [
+      { name: 'Docker', evidence: ['hotel-commerce-service'] },
+      { name: 'GitHub Actions', evidence: ['hotel-commerce-service'] },
+      { name: 'Vercel · Render', evidence: ['hotel-commerce-service'] },
+      { name: 'JUnit 5 · Mockito', evidence: ['hotel-commerce-service'] },
+      { name: 'Vitest', evidence: ['hotel-commerce-service', 'linguatype'] },
+    ],
+  },
+  {
     title: 'Other languages',
+    summary: 'Languages I know at a beginner level.',
+    color: 'slate',
     skills: [
       { name: 'C · C++', detail: 'Beginner level' },
       { name: 'R', detail: 'Beginner level' },
@@ -110,6 +124,8 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     title: 'Creative & AI tools',
+    summary: 'Design, video editing, 3D and AI tools.',
+    color: 'rose',
     skills: [
       { name: 'Adobe Photoshop' },
       { name: 'Adobe Premiere Pro' },

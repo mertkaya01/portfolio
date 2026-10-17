@@ -13,8 +13,6 @@
   --color-muted: #8a93a0; /* secondary text */
   --color-accent: #ffd23f; /* the one accent: volleyball yellow */
   --color-go: #4ade80; /* status light only: "open to new opportunities" */
-  --color-ember: #ff4d4d; /* click-burst spark */
-  --color-sky: #7dd3fc; /* click-burst spark */
 
   /* Display: stadium / scoreboard lettering · Body: readable text · Mono: labels, dates, tech */
   --font-display: 'Big Shoulders Variable', ui-sans-serif, system-ui, sans-serif;
@@ -36,6 +34,8 @@
   --animate-fly-in: fly-in 1.5s var(--ease-out-expo) both;
   --animate-backdrop-in: backdrop-in 2.6s ease-in-out 2.4s both; /* after the title lands */
   --animate-line-pulse: line-pulse 7s ease-in-out infinite;
+  --animate-frame-spin: frame-spin 7s linear infinite;
+  --animate-fade-in: fade-in 0.35s ease-out both;
   --animate-burst-glow: burst-glow 1.3s var(--ease-out-expo) both;
   --animate-spark: spark 1s var(--ease-out-expo) both;
   --animate-twinkle: twinkle 6s ease-in-out infinite;
@@ -137,6 +137,21 @@
     }
   }
 
+  /* A quiet appearance: used when the skills filter swaps the cards */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+
+  /* The light around the player card's photo frame goes once around */
+  @keyframes frame-spin {
+    to {
+      --frame-angle: 360deg;
+    }
+  }
+
   /* Click burst on a card: the glow grows and fades… */
   @keyframes burst-glow {
     from {
@@ -223,6 +238,37 @@
   }
 }
 
+/*
+  A typed CSS variable: because the browser knows it is an angle, it can animate it smoothly
+  (a plain custom property would jump). Used by the player card's photo frame.
+*/
+@property --frame-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/*
+  Extra colors for the click bursts and the skill groups. They are picked at runtime
+  (var(--color-${group.color}) in SkillsSection), so Tailwind can't see them being used and
+  would drop them. `static` tells Tailwind to always write these variables into the CSS.
+*/
+@theme static {
+  /* bright: click bursts and the photo frame light */
+  --color-ember: #ff4d4d;
+  --color-sky: #7dd3fc;
+
+  /* muted: one per skill group, calm enough to sit next to text (all ≥ 6:1 on the card color) */
+  --color-tone-cyan: #6fb7c8; /* Backend */
+  --color-tone-amber: #d6a756; /* Frontend */
+  --color-tone-coral: #dd8473; /* AI & Computer Vision */
+  --color-tone-sand: #b59a7c;
+  --color-tone-sage: #86a98f;
+  --color-tone-lavender: #9d94c4;
+  --color-tone-slate: #8f9aa8;
+  --color-tone-rose: #c38aa0;
+}
+
 @layer base {
   html {
     color-scheme: dark;
@@ -235,5 +281,42 @@
 
   :focus-visible {
     @apply outline-2 outline-offset-4 outline-accent;
+  }
+}
+
+/*
+  Page transitions (links with `viewTransition`): the browser takes a snapshot of the old page,
+  then of the new one, and animates between them. The old page drifts up and blurs away,
+  the new one rises in. The backdrop has its own name, so it stays still during the swap.
+*/
+::view-transition-old(root) {
+  animation: page-out 0.3s var(--ease-out-expo) both;
+}
+
+::view-transition-new(root) {
+  animation: page-in 0.55s var(--ease-out-expo) both;
+}
+
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-14px);
+    filter: blur(6px);
+  }
+}
+
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+    filter: blur(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
