@@ -5,10 +5,16 @@ Built with React, TypeScript, Vite and Tailwind CSS. (Full README comes with the
 
 ## Scripts
 
-| Command           | What it does                                  |
-| ----------------- | --------------------------------------------- |
-| `npm run dev`     | Start the dev server at http://localhost:5173 |
-| `npm run build`   | Type-check and build for production (`dist/`) |
-| `npm run preview` | Serve the production build locally            |
-| `npm run lint`    | Lint with Oxlint                              |
-| `npm run format`  | Format all files with Prettier                |
+| Command                 | What it does                                  |
+| ----------------------- | --------------------------------------------- |
+| `npm run dev`           | Start the dev server at http://localhost:5173 |
+| `npm run build`         | Type-check and build for production (`dist/`) |
+| `npm run preview`       | Serve the production build locally            |
+| `npm run lint`          | Lint with Oxlint                              |
+| `npm run format`        | Format all files with Prettier                |
+| `npm run content:check` | Validate `src/data` and list open TODOs       |
+
+## Content
+
+All site content lives in typed files in `src/data/` (profile, projects, experience, education,
+skills, quest). To add a project, copy an object in `src/data/projects.ts` — no UI code changes.

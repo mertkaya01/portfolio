@@ -9,7 +9,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "content:check": "node scripts/check-content.ts"
   },
   "dependencies": {
     "react": "^19.2.8",
