@@ -13,6 +13,10 @@
     "content:check": "node scripts/check-content.ts"
   },
   "dependencies": {
+    "@fontsource-variable/big-shoulders": "^5.3.0",
+    "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "motion": "^14.3.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

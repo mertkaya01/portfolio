@@ -41,10 +41,12 @@ export const certificates: Certificate[] = [
     name: 'Introduction to Software Testing (participation)',
     issuer: 'BTK Akademi',
     date: '2026-06',
+    file: '/certificates/btk-intro-to-software-testing.pdf',
   },
   {
     name: 'Linux Fundamentals 101 · 201 · 301 · 401',
     issuer: 'Turkcell Akademi — Geleceği Yazanlar',
     date: '2024-09',
+    file: '/certificates/turkcell-linux-fundamentals-101-401.pdf',
   },
 ]

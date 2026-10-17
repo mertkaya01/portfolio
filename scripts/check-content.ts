@@ -12,15 +12,11 @@ import { profile } from '../src/data/profile.ts'
 import { projects } from '../src/data/projects.ts'
 import { chapters } from '../src/data/quest.ts'
 import { skillGroups } from '../src/data/skills.ts'
+import { isTodo } from '../src/lib/todo.ts'
 
 const errors: string[] = []
 const warnings: string[] = []
 const todos: string[] = []
-
-// The return type says "if true, this is a string starting with TODO:". Saying just "string"
-// would make TypeScript think every non-TODO value can't be a string at all.
-const isTodo = (value: unknown): value is `TODO:${string}` =>
-  typeof value === 'string' && value.startsWith('TODO:')
 
 // Walk through any value (object, array, string) and note every TODO with where it was found
 function collectTodos(value: unknown, path: string) {
@@ -52,8 +48,7 @@ function checkSlug(slug: string, where: string) {
 }
 for (const group of skillGroups) {
   for (const skill of group.skills) {
-    if (skill.evidence.length === 0) warnings.push(`Skill "${skill.name}" has no evidence project`)
-    skill.evidence.forEach((slug) => checkSlug(slug, `Skill "${skill.name}"`))
+    skill.evidence?.forEach((slug) => checkSlug(slug, `Skill "${skill.name}"`))
   }
 }
 for (const job of experience) {
@@ -74,6 +69,9 @@ function checkLink(href: string | undefined, where: string) {
 checkLink(profile.links.github, 'profile.links.github')
 checkLink(profile.links.linkedin, 'profile.links.linkedin')
 checkLink(profile.links.cv, 'profile.links.cv')
+checkLink(profile.photo.src, 'profile.photo')
+checkLink(profile.gaming.profileUrl, 'profile.gaming.profileUrl')
+for (const cert of certificates) checkLink(cert.file, `Certificate "${cert.name}"`)
 if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(profile.email)) errors.push(`profile.email looks wrong`)
 
 for (const project of projects) {

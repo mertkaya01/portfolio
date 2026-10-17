@@ -12,7 +12,9 @@ export type Profile = {
   name: string
   headline: string // one line under the name
   location: string
+  photo: { src: string; alt: string } // shown on the player card
   summary: string // 2–3 sentences for the hero / about section
+  availability: string // status line on the player card
   lookingFor: string[] // roles he is applying for
   email: string
   links: { github: string; linkedin: string; cv: string }
@@ -20,10 +22,12 @@ export type Profile = {
   volleyball: {
     years: number
     position: string
-    alsoPlayed: string[]
+    positionNote: string // the playful line on the back of the card
     jerseyNumber: string
     startedIn: string
   }
+  sport: { medals: number; highlights: string[] }
+  gaming: { game: string; shortName: string; platform: string; level: number; profileUrl: string }
 }
 
 // ---------- Projects ----------
@@ -93,14 +97,19 @@ export type Education = {
   details: string[]
 }
 
-export type Certificate = { name: string; issuer: string; date: string }
-
-export type SkillGroup = {
-  title: string
-  // Every skill points at the projects that prove it (slugs from projects.ts).
-  // No self-rated levels or percentages: evidence instead of numbers.
-  skills: { name: string; evidence: string[] }[]
+export type Certificate = {
+  name: string
+  issuer: string
+  date: string
+  file: string // PDF in public/certificates/
 }
+
+// No self-rated levels or percentages. Where a skill was used in a project, `evidence`
+// points at it (slugs from projects.ts); `detail` says what exactly was done or how much.
+export type Skill = { name: string; detail?: string; evidence?: string[] }
+
+// `main` groups start open; the others start as thin cards you can click open
+export type SkillGroup = { title: string; main?: boolean; skills: Skill[] }
 
 // ---------- Quest (the 5 "sets" of the story) ----------
 
