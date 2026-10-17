@@ -36,6 +36,8 @@
   --animate-line-pulse: line-pulse 7s ease-in-out infinite;
   --animate-frame-spin: frame-spin 7s linear infinite;
   --animate-fade-in: fade-in 0.35s ease-out both;
+  --animate-stage-out: stage-out 0.95s ease-in-out both; /* quest → portfolio */
+  --animate-spike-flash: spike-flash 0.6s ease-out both;
   --animate-burst-glow: burst-glow 1.3s var(--ease-out-expo) both;
   --animate-spark: spark 1s var(--ease-out-expo) both;
   --animate-twinkle: twinkle 6s ease-in-out infinite;
@@ -142,6 +144,30 @@
     from {
       opacity: 0;
       translate: 0 6px;
+    }
+  }
+
+  /* The quest stage stays dark while the court line is drawn, then fades away */
+  @keyframes stage-out {
+    0%,
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* After the spike: one quick flash of light */
+  @keyframes spike-flash {
+    0% {
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
     }
   }
 

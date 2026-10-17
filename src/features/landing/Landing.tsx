@@ -1,9 +1,12 @@
-// The dark opening screen. It becomes the real "quest" landing in Milestone 6;
-// until then "Skip to portfolio" simply scrolls down to the portfolio.
-import { m, useScroll, useTransform } from 'motion/react'
-import { useRef } from 'react'
+// The dark opening screen with its two doors: start the quest, or skip to the portfolio.
+// Milestone 6 turns it into the real quest landing; the doors already work.
+import { m, useInView, useScroll, useTransform } from 'motion/react'
+import { useEffect, useRef, type MouseEvent } from 'react'
 
+import { isQuestOpen } from '@/app/experienceMachine'
+import { useExperience } from '@/app/experienceStore'
 import { profile } from '@/data/profile'
+import { handlesOwnKeys, hasModifier } from '@/lib/keyboard'
 
 import { FlyInTitle } from './FlyInTitle'
 
@@ -11,8 +14,17 @@ import { FlyInTitle } from './FlyInTitle'
 const NAME_START = 500
 const LETTER_GAP = 80
 
+// First visit: Skip plays the short transition into the portfolio.
+// Already seen it this session: Skip just scrolls down.
+function skip() {
+  const { state, send } = useExperience.getState()
+  if (state.name === 'LANDING') send({ type: 'SKIP' })
+  else document.getElementById('about')?.scrollIntoView()
+}
+
 export function Landing() {
   const ref = useRef<HTMLElement>(null)
+  const send = useExperience((s) => s.send)
 
   // 0 while the landing fills the screen → 1 once it has scrolled completely out of view
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
@@ -23,6 +35,35 @@ export function Landing() {
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.88])
   const opacity = useTransform(scrollYProgress, [0, 0.65], [1, 0])
   const lightOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+
+  // The keys only work while the landing is actually on screen: Enter far down the page
+  // should not suddenly start the quest
+  const inView = useInView(ref, { amount: 0.5 })
+
+  useEffect(() => {
+    if (!inView) return
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.repeat || hasModifier(e)) return
+      if (isQuestOpen(useExperience.getState().state)) return // the quest has its own keys
+      if (e.key === 'Enter') {
+        if (handlesOwnKeys(e.target)) return // a focused link or button does its own thing
+        e.preventDefault()
+        send({ type: 'START' })
+      } else if (e.key === 'Escape' || e.key === 's' || e.key === 'S') {
+        e.preventDefault()
+        skip()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [inView, send])
+
+  // A real link, so it still works as a plain "jump to #about" if anything else fails
+  function onSkipClick(e: MouseEvent) {
+    if (useExperience.getState().state.name !== 'LANDING') return
+    e.preventDefault()
+    skip()
+  }
 
   return (
     <section
@@ -57,20 +98,28 @@ export function Landing() {
           className="mt-8 block h-px w-32 animate-draw-line bg-wood/60 [animation-delay:2300ms]"
         />
 
-        <p className="mt-12 animate-rise text-sm text-muted [animation-delay:2800ms]">
-          Press{' '}
-          <kbd className="inline-block animate-breathe rounded border border-muted/40 px-2 py-0.5 font-mono text-accent [animation-delay:3700ms]">
-            Enter
-          </kbd>{' '}
-          to start — coming soon
-        </p>
+        {/* The two doors */}
+        <div className="mt-12 flex flex-col items-center gap-5 sm:flex-row sm:gap-6">
+          <button
+            type="button"
+            onClick={() => send({ type: 'START' })}
+            className="inline-flex animate-rise items-center gap-3 rounded-full border border-accent/60 px-6 py-3 font-mono text-xs tracking-[0.2em] text-accent uppercase transition-colors [animation-delay:2800ms] hover:bg-accent hover:text-night"
+          >
+            Start the quest
+            <kbd className="animate-breathe rounded border border-current/40 px-1.5 text-[0.65rem] [animation-delay:3700ms]">
+              Enter
+            </kbd>
+          </button>
 
-        <a
-          href="#about"
-          className="mt-6 animate-rise font-mono text-xs tracking-[0.25em] text-light/70 uppercase transition-colors [animation-delay:3100ms] hover:text-accent"
-        >
-          Skip to portfolio ↓
-        </a>
+          <a
+            href="#about"
+            onClick={onSkipClick}
+            className="inline-flex animate-rise items-center gap-3 px-2 py-3 font-mono text-xs tracking-[0.2em] text-light/70 uppercase transition-colors [animation-delay:3100ms] hover:text-accent"
+          >
+            Skip to portfolio
+            <kbd className="rounded border border-current/30 px-1.5 text-[0.65rem]">S</kbd>
+          </a>
+        </div>
       </m.div>
     </section>
   )

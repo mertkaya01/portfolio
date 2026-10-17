@@ -8,7 +8,13 @@ import { PlayerCard } from '../PlayerCard'
 // The first thing after the landing: who I am in three sentences, plus the player card
 export function HeroSection() {
   return (
-    <section id="about" aria-labelledby="about-title" className="scroll-mt-20">
+    // tabIndex -1: after the quest, keyboard focus lands here (by script only, never by Tab)
+    <section
+      id="about"
+      aria-labelledby="about-title"
+      tabIndex={-1}
+      className="scroll-mt-20 outline-none"
+    >
       <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-[1.25fr_1fr] lg:py-28">
         <Reveal>
           <p className="font-mono text-xs tracking-[0.3em] text-muted uppercase">
