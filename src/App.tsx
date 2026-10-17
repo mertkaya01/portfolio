@@ -1,12 +1,12 @@
 // Milestone 1 placeholder: proves React, TypeScript and Tailwind (with our tokens) all work.
 // This screen becomes the real "quest" landing in Milestone 6.
-import { FlipTitle } from '@/features/landing/FlipTitle'
+import { FlyInTitle } from '@/features/landing/FlyInTitle'
 
 const NAME = 'MERT KAYA'
 
 // Timeline of the entrance (ms). Each element waits for its turn.
-const NAME_START = 600
-const LETTER_GAP = 60
+const NAME_START = 500
+const LETTER_GAP = 80
 
 function App() {
   return (
@@ -21,21 +21,21 @@ function App() {
         Portfolio · 2026
       </p>
 
-      <FlipTitle name={NAME} start={NAME_START} gap={LETTER_GAP} />
+      <FlyInTitle name={NAME} start={NAME_START} gap={LETTER_GAP} />
 
-      <p className="mt-4 animate-track-in text-base tracking-[0.3em] text-wood uppercase [animation-delay:1300ms] sm:text-lg">
+      <p className="mt-4 animate-track-in text-base tracking-[0.3em] text-wood uppercase [animation-delay:1900ms] sm:text-lg">
         Beyond the Court
       </p>
 
       {/* First appearance of the "line" motif: a court line drawn under the title */}
       <span
         aria-hidden="true"
-        className="mt-8 block h-px w-32 animate-draw-line bg-wood/60 [animation-delay:1700ms]"
+        className="mt-8 block h-px w-32 animate-draw-line bg-wood/60 [animation-delay:2300ms]"
       />
 
-      <p className="mt-12 animate-rise text-sm text-muted [animation-delay:2300ms]">
+      <p className="mt-12 animate-rise text-sm text-muted [animation-delay:2800ms]">
         Press{' '}
-        <kbd className="inline-block animate-breathe rounded border border-muted/40 px-2 py-0.5 font-body text-accent [animation-delay:3200ms]">
+        <kbd className="inline-block animate-breathe rounded border border-muted/40 px-2 py-0.5 font-body text-accent [animation-delay:3700ms]">
           Enter
         </kbd>{' '}
         to start — coming soon
