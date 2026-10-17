@@ -1,0 +1,141 @@
+@import 'tailwindcss';
+
+/*
+  Design tokens — "Silhouette & Light".
+  Every token here becomes a Tailwind class: --color-night → bg-night, text-night ...
+  Change a value here and the whole site follows. (Palette is a first draft; refined in M6.)
+*/
+@theme {
+  --color-night: #0a0b0d; /* near-black arena */
+  --color-shadow: #16181c; /* raised surfaces */
+  --color-wood: #c98b52; /* warm court parquet */
+  --color-light: #e6edf5; /* cool blue-white overhead light */
+  --color-muted: #8a93a0; /* secondary text */
+  --color-accent: #ffd23f; /* the one accent: volleyball yellow */
+
+  /* System fonts for now; the real display/body fonts are chosen in M3. */
+  --font-display: ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+  --font-body: ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+
+  /*
+    Entrance animations. "--animate-x" becomes the class "animate-x".
+    "both" keeps the first frame before the delay starts and the last frame after it ends,
+    so elements don't flash before their turn.
+  */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1); /* fast start, soft landing */
+
+  --animate-light-on: light-on 1.8s ease-out both;
+  --animate-rise: rise 0.9s var(--ease-out-expo) both;
+  --animate-track-in: track-in 1.4s var(--ease-out-expo) both;
+  --animate-draw-line: draw-line 1.1s cubic-bezier(0.65, 0, 0.35, 1) both;
+  --animate-breathe: breathe 2.4s ease-in-out infinite;
+  --animate-flip-in: flip-in 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both; /* slight overshoot */
+
+  /* Arena lights warming up: a couple of flickers, then steady */
+  @keyframes light-on {
+    0% {
+      opacity: 0;
+    }
+    18% {
+      opacity: 0.6;
+    }
+    26% {
+      opacity: 0.1;
+    }
+    40% {
+      opacity: 0.8;
+    }
+    50% {
+      opacity: 0.35;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  /* Slide up out of a blur */
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+
+  /* Letters drift apart while fading in */
+  @keyframes track-in {
+    from {
+      opacity: 0;
+      letter-spacing: 0.05em;
+    }
+    to {
+      opacity: 1;
+      letter-spacing: 0.3em;
+    }
+  }
+
+  /* A court line drawn from the center outwards */
+  @keyframes draw-line {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* A scoreboard flap: the letter swings up from lying flat (needs a parent with perspective) */
+  @keyframes flip-in {
+    from {
+      opacity: 0;
+      transform: rotateX(-100deg);
+    }
+    30% {
+      opacity: 1;
+    }
+    to {
+      opacity: 1;
+      transform: rotateX(0deg);
+    }
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.45;
+    }
+  }
+}
+
+/* Visitors who ask for less motion get the final frame immediately */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-night font-body text-light antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-accent;
+  }
+}
