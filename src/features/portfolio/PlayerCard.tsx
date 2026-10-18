@@ -26,6 +26,8 @@ export function PlayerCard() {
         >
           {/* Inner layer: the flip. Both faces sit on top of each other; the back starts turned away */}
           <div
+            // data-transition-target: the skip transition lands its court frame exactly here
+            data-transition-target
             className={`relative aspect-[5/7] transition-transform duration-700 ease-out-expo transform-3d ${flipped ? 'rotate-y-180' : ''}`}
           >
             <CardFront hidden={flipped} />

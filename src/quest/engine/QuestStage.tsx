@@ -90,8 +90,9 @@ export function QuestStage() {
         tabIndex={-1}
         onTouchStart={swipe.onTouchStart}
         onTouchEnd={swipe.onTouchEnd}
-        className={`flex size-full touch-pan-y flex-col overscroll-contain outline-none ${
-          state.name === 'TRANSITION' ? '' : 'bg-night'
+        // stage-in: the dark stage fades in over the (already dark) landing
+        className={`relative flex size-full touch-pan-y flex-col overscroll-contain outline-none ${
+          state.name === 'TRANSITION' ? '' : 'animate-stage-in bg-night'
         }`}
       >
         {state.name === 'TRANSITION' ? (

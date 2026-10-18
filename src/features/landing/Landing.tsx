@@ -1,5 +1,5 @@
-// The dark opening screen with its two doors: start the quest, or skip to the portfolio.
-// Milestone 6 turns it into the real quest landing; the doors already work.
+// The opening scene: a dark arena, one lamp switching on above an empty court, the name falling
+// out of the light — and two doors: play the story, or skip to the portfolio.
 import { m, useInView, useScroll, useTransform } from 'motion/react'
 import { useEffect, useRef, type MouseEvent } from 'react'
 
@@ -7,12 +7,19 @@ import { isQuestOpen } from '@/app/experienceMachine'
 import { useExperience } from '@/app/experienceStore'
 import { profile } from '@/data/profile'
 import { handlesOwnKeys, hasModifier } from '@/lib/keyboard'
+import { CourtFloor } from '@/quest/scene-kit/CourtFloor'
+import { Grain } from '@/quest/scene-kit/Grain'
+import { LightCone } from '@/quest/scene-kit/LightCone'
+import { ParallaxLayer, ParallaxScene } from '@/quest/scene-kit/Parallax'
 
 import { FlyInTitle } from './FlyInTitle'
 
-// Timeline of the entrance (ms). Each element waits for its turn.
+// Timeline of the entrance (ms). Each element waits for its turn:
+// the lamp flickers on → the letters fall out of its light → the court is traced → the doors
+const LAMP_ON = 200
 const NAME_START = 500
 const LETTER_GAP = 80
+const COURT_START = 2100
 
 // First visit: Skip plays the short transition into the portfolio.
 // Already seen it this session: Skip just scrolls down.
@@ -34,7 +41,7 @@ export function Landing() {
   const y = useTransform(scrollYProgress, [0, 1], ['0%', '35%'])
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.88])
   const opacity = useTransform(scrollYProgress, [0, 0.65], [1, 0])
-  const lightOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+  const sceneOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0])
 
   // The keys only work while the landing is actually on screen: Enter far down the page
   // should not suddenly start the quest
@@ -70,16 +77,48 @@ export function Landing() {
       ref={ref}
       id="top"
       aria-label="Intro"
-      className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 text-center"
+      // isolate: the scene layers below (-z-10) stay inside this section, under the text.
+      // pb: the content sits a little above the middle, leaving the floor to the court.
+      className="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 pb-[16vh] text-center"
     >
-      {/* Overhead spotlight: a big blurred ellipse of cool light that flickers on, then dims on scroll */}
+      {/* The landing is its own dark scene: it covers the site's arena backdrop, and only lets
+          it through at the very bottom, so scrolling into the portfolio has no hard edge */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-linear-to-b from-night from-95%"
+      />
+
+      {/* The scene: lamp and court. It fades as you scroll away. */}
       <m.div
         aria-hidden="true"
-        style={{ opacity: lightOpacity }}
-        className="pointer-events-none absolute -top-48 left-1/2 h-96 w-[48rem] max-w-[150vw] -translate-x-1/2"
+        style={{ opacity: sceneOpacity }}
+        className="absolute inset-0 -z-10"
       >
-        <div className="h-full w-full animate-light-on rounded-full bg-light/10 blur-3xl" />
+        <ParallaxScene className="absolute inset-0">
+          <ParallaxLayer depth={6} className="absolute inset-0">
+            <LightCone dust delay={LAMP_ON} />
+          </ParallaxLayer>
+
+          <ParallaxLayer depth={-16} className="absolute inset-x-0 bottom-0 h-[42%]">
+            {/* warm pool of light where the beam meets the parquet */}
+            <div
+              className="absolute inset-x-[18%] top-[22%] bottom-[2%] animate-light-on rounded-[50%] bg-wood/10 blur-3xl"
+              style={{ animationDelay: `${LAMP_ON}ms` }}
+            />
+            {/* the court lines fade out where the light ends */}
+            <CourtFloor
+              start={COURT_START}
+              className="absolute inset-0 size-full [mask-image:radial-gradient(ellipse_62%_85%_at_50%_70%,#000_45%,transparent_100%)]"
+            />
+          </ParallaxLayer>
+        </ParallaxScene>
       </m.div>
+      {/* Grain sits outside the fading layer: a layer with opacity is mixed on its own, so the
+          grain's blend would see only empty space there instead of the dark scene */}
+      <Grain
+        opacity={0.3}
+        className="-z-10 [mask-image:linear-gradient(to_bottom,#000_85%,transparent_92%)]"
+      />
 
       <m.div style={{ y, scale, opacity }} className="flex flex-col items-center">
         <p className="animate-rise font-mono text-xs tracking-[0.4em] text-muted uppercase [animation-delay:300ms]">
@@ -92,14 +131,12 @@ export function Landing() {
           Beyond the Court
         </p>
 
-        {/* First appearance of the "line" motif: a court line drawn under the title */}
-        <span
-          aria-hidden="true"
-          className="mt-8 block h-px w-32 animate-draw-line bg-wood/60 [animation-delay:2300ms]"
-        />
+        <p className="mt-5 max-w-sm animate-rise text-sm text-light/60 [animation-delay:2500ms] sm:text-base">
+          My story so far, played as a five-set match.
+        </p>
 
         {/* The two doors */}
-        <div className="mt-12 flex flex-col items-center gap-5 sm:flex-row sm:gap-6">
+        <div className="mt-10 flex flex-col items-center gap-5 sm:flex-row sm:gap-6">
           <button
             type="button"
             onClick={() => send({ type: 'START' })}
