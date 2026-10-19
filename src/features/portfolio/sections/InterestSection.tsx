@@ -7,26 +7,25 @@ import type { SportIcon } from '@/types/content'
 
 const { volleyball, sport, gaming, name } = profile
 
-// LED-style scoreboard digits: always two characters, like "09"
-const pad = (value: string | number) => String(value).padStart(2, '0')
-
+// Four separate statistics. Each gets a one-line note (from the same profile data), so
+// "16", "9" and "2017" read as three different things — not as a date.
 const STATS = [
-  { label: 'Medals', value: pad(sport.medals) },
-  { label: 'Seasons', value: pad(volleyball.years) },
-  { label: 'Since', value: volleyball.startedIn },
-  { label: 'Position', value: initials(volleyball.position) },
+  { label: 'Medals', value: String(sport.medals), note: 'Sports & math competitions' },
+  { label: 'Seasons', value: String(volleyball.years), note: 'Competitive volleyball' },
+  { label: 'Since', value: volleyball.startedIn, note: 'First season' },
+  { label: 'Position', value: initials(volleyball.position), note: volleyball.position },
 ]
 
 // FACEIT shows level 10 in red
 const FACEIT_LEVEL_10 = '#fe1f00'
 
-export function SportSection() {
+export function InterestSection() {
   return (
     <Section
-      id="sport"
+      id="interest"
       index="05"
       kicker="Beyond the court"
-      title="Sport"
+      title="Interest"
       intro={`${sport.medals} medals in total — from inter-school tournaments, orienteering and athletics to math competitions.`}
     >
       <Reveal>
@@ -95,12 +94,12 @@ function Scoreboard() {
         </span>
       </div>
 
-      {/* gap-px over a light background draws the thin lines between the cells */}
-      <dl className="grid grid-cols-2 gap-px bg-light/10 sm:grid-cols-4">
+      {/* Each statistic is its own LED panel, with space around it: four separate numbers */}
+      <dl className="grid grid-cols-2 gap-3 p-3 sm:gap-4 sm:p-4 lg:grid-cols-4">
         {STATS.map((stat) => (
           <div
             key={stat.label}
-            className="bg-night p-6 sm:p-8"
+            className="rounded-xl border border-light/10 bg-night px-5 py-5 sm:px-6"
             // faint horizontal scan lines: the texture of an LED panel
             style={{
               backgroundImage:
@@ -110,8 +109,11 @@ function Scoreboard() {
             <dt className="font-mono text-[0.65rem] tracking-[0.3em] text-muted uppercase">
               {stat.label}
             </dt>
-            <dd className="mt-3 font-mono text-5xl font-bold text-accent tabular-nums [text-shadow:0_0_14px_rgb(255_210_63/0.35)] sm:text-6xl">
+            <dd className="mt-3 font-mono text-4xl font-bold text-accent tabular-nums [text-shadow:0_0_14px_rgb(255_210_63/0.35)] sm:text-5xl">
               {stat.value}
+            </dd>
+            <dd className="mt-2 border-t border-light/10 pt-2 text-xs leading-snug text-light/60">
+              {stat.note}
             </dd>
           </div>
         ))}

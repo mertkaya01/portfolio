@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router'
 
 import { isExternal } from '@/lib/format'
 
@@ -29,6 +30,18 @@ export function ButtonLink({
   className = '',
 }: Props) {
   const external = isExternal(href) || newTab
+  const classes = `inline-flex items-center gap-2 font-mono text-xs font-semibold tracking-[0.15em] uppercase transition-colors ${VARIANTS[variant]} ${className}`
+
+  // A section of this page ("#projects"): go through the router, like the nav does.
+  // A plain "#" link changes the URL, but the router's scroll restoration then puts the page
+  // back where it was — the link would seem to do nothing.
+  if (href.startsWith('#')) {
+    return (
+      <Link to={{ hash: href.slice(1) }} className={classes}>
+        {children}
+      </Link>
+    )
+  }
 
   return (
     <a
@@ -36,7 +49,7 @@ export function ButtonLink({
       download={download}
       target={external ? '_blank' : undefined}
       rel={external ? 'noopener noreferrer' : undefined}
-      className={`inline-flex items-center gap-2 font-mono text-xs font-semibold tracking-[0.15em] uppercase transition-colors ${VARIANTS[variant]} ${className}`}
+      className={classes}
     >
       {children}
       {external && (

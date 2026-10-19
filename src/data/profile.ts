@@ -24,6 +24,8 @@ export const profile: Profile = {
     { name: 'English', level: 'C1' },
     { name: 'German', level: 'A2' },
   ],
+  // On the back of the player card, under "Licenses & certifications"
+  licenses: ['A2 & B Driving Licenses', 'Drone Pilot', 'Boat License', 'Radio Operator'],
   volleyball: {
     years: 9,
     position: 'Outside Hitter',
@@ -60,7 +62,6 @@ export const profile: Profile = {
   },
   gaming: {
     game: 'Counter-Strike 2',
-    shortName: 'CS2',
     platform: 'FACEIT',
     level: 10,
     profileUrl: 'https://www.faceit.com/en/players/Mhelling',

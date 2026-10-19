@@ -20,7 +20,7 @@ export function ProjectsSection() {
   return (
     <Section
       id="projects"
-      index="01"
+      index="03"
       kicker="Featured work"
       title="Projects"
       intro="What I built, what my part was, and the engineering decisions I would explain in an interview."

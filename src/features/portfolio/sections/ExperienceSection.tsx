@@ -1,10 +1,12 @@
 import { m, useInView, useScroll } from 'motion/react'
 import { useRef } from 'react'
+import { Link } from 'react-router'
 
 import { Chip } from '@/components/ui/Chip'
 import { Reveal } from '@/components/ui/Reveal'
 import { Section } from '@/components/ui/Section'
 import { experience } from '@/data/experience'
+import { projectPath } from '@/features/projects/labels'
 import { profile } from '@/data/profile'
 import { formatDuration, formatRange } from '@/lib/format'
 import { projectTitle } from '@/lib/projects'
@@ -20,7 +22,7 @@ export function ExperienceSection() {
   })
 
   return (
-    <Section id="experience" index="03" kicker="Where I've worked" title="Experience">
+    <Section id="experience" index="02" kicker="Where I've worked" title="Experience">
       <div ref={timelineRef} className="relative ml-1.5">
         {/* The rail, and the part of it you have already "played" */}
         <span aria-hidden="true" className="absolute inset-y-0 left-0 w-px bg-wood/20" />
@@ -84,12 +86,14 @@ export function ExperienceSection() {
                       {job.projectSlugs.map((slug, i) => (
                         <span key={slug}>
                           {i > 0 && ', '}
-                          <a
-                            href={`#project-${slug}`}
-                            className="text-light/80 underline decoration-light/20 underline-offset-2 transition-colors hover:text-accent"
+                          {/* opens the project's page: the case study, or the short page */}
+                          <Link
+                            to={projectPath(slug)}
+                            viewTransition
+                            className="text-light/80 underline decoration-light/20 underline-offset-2 transition-colors hover:text-accent hover:decoration-accent focus-visible:text-accent"
                           >
                             {projectTitle.get(slug)}
-                          </a>
+                          </Link>
                         </span>
                       ))}
                     </p>

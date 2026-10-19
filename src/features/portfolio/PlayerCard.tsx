@@ -5,9 +5,11 @@ import { profile } from '@/data/profile'
 import { TILT_STYLE, useTilt } from '@/hooks/useTilt'
 
 const { volleyball } = profile
-const role = profile.headline.split(' · ')[0] // "Computer Engineer"
+const [role, ...focusAreas] = profile.headline.split(' · ') // "Computer Engineer", then the focus areas
+const focus = focusAreas.join(' · ') // "Backend & Full-stack · Applied AI"
 
-// A volleyball trading card. Front: photo, number, name, availability. Back: a "scouting report".
+// The profile card. Front: photo, name, role, focus, availability. Back: a "scouting report".
+// (It started as a volleyball trading card; the sport now stays in the details.)
 // Click the button (or press Enter on it) to flip; the mouse tilts it and moves a light sheen.
 export function PlayerCard() {
   const [flipped, setFlipped] = useState(false)
@@ -83,24 +85,21 @@ function CardFront({ hidden }: { hidden: boolean }) {
               draggable={false}
               className="h-full w-full object-cover object-[50%_18%] contrast-[1.05] grayscale-[35%] transition duration-700 group-hover:grayscale-0"
             />
+            {/* a light fade at the bottom, so the photo melts into the card */}
             <div
               aria-hidden="true"
-              className="absolute inset-0 bg-linear-to-t from-night via-night/20 to-night/5"
+              className="absolute inset-0 bg-linear-to-t from-night/70 via-transparent to-transparent"
             />
 
             <div className="absolute inset-x-0 top-0 flex items-start justify-between p-4">
               <span className="font-mono text-[0.6rem] tracking-[0.3em] text-light/75 uppercase">
                 Beyond the Court
               </span>
-              <span className="rounded bg-accent px-2 py-1 font-mono text-[0.6rem] font-bold tracking-[0.15em] text-night uppercase">
+              {/* the volleyball side stays, quietly: an outlined tag, not a bright badge */}
+              <span className="rounded border border-light/25 bg-night/60 px-2 py-1 font-mono text-[0.6rem] tracking-[0.15em] text-light/85 uppercase backdrop-blur-sm">
                 {volleyball.position}
               </span>
             </div>
-
-            <p className="absolute right-4 -bottom-2 font-display text-8xl leading-none font-black text-light/90 [text-shadow:0_6px_24px_rgb(0_0_0/0.6)]">
-              <span className="sr-only">Jersey number </span>
-              {volleyball.jerseyNumber}
-            </p>
           </div>
         </div>
       </div>
@@ -110,6 +109,9 @@ function CardFront({ hidden }: { hidden: boolean }) {
           {profile.name}
         </p>
         <p className="mt-1 text-sm text-wood">{role}</p>
+        <p className="mt-2 font-mono text-[0.65rem] tracking-[0.15em] text-light/60 uppercase">
+          {focus}
+        </p>
 
         {/* Availability: a green "live" light, like a status LED */}
         <p className="mt-auto flex items-center gap-2.5 border-t border-light/10 pt-4 font-mono text-[0.65rem] tracking-[0.2em] text-light uppercase">
@@ -127,9 +129,7 @@ function CardFront({ hidden }: { hidden: boolean }) {
 }
 
 function CardBack({ hidden }: { hidden: boolean }) {
-  const offCourt = profile.headline.split(' · ').slice(1).join(' · ')
   const languages = profile.spokenLanguages.map((l) => `${l.name} (${l.level})`).join(' · ')
-  const { gaming } = profile
 
   return (
     <div aria-hidden={hidden} className={`${FACE} rotate-y-180 border-accent/30 bg-shadow p-6`}>
@@ -137,14 +137,12 @@ function CardBack({ hidden }: { hidden: boolean }) {
       <p className="relative font-mono text-xs tracking-[0.3em] text-accent uppercase">
         Scouting report
       </p>
-      <dl className="relative mt-5 space-y-3.5 text-sm">
+      <dl className="relative mt-5 space-y-3 text-sm">
         <Row term="Position">{volleyball.positionNote}</Row>
-        <Row term="Off court">{offCourt}</Row>
+        <Row term="Off court">{focus}</Row>
         <Row term="Languages">{languages}</Row>
         <Row term="Looking for">{profile.lookingFor.join(' · ')}</Row>
-        <Row term="Also plays">
-          {gaming.shortName} · {gaming.platform} Level {gaming.level}
-        </Row>
+        <Row term="Licenses & certifications">{profile.licenses.join(' · ')}</Row>
         <Row term="Based in">{profile.location}</Row>
       </dl>
       <p className="relative mt-auto font-display text-2xl font-extrabold uppercase">

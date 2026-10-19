@@ -44,7 +44,7 @@ function Screen({ code, title, message }: { code: string; title: string; message
         className="mx-auto flex min-h-[75dvh] max-w-6xl flex-col items-center justify-center px-4 py-24 text-center"
       >
         <Reveal>
-          {/* the same LED style as the scoreboard in the Sport section */}
+          {/* the same LED style as the scoreboard in the Interest section */}
           <p
             aria-hidden="true"
             className="font-mono text-7xl font-bold text-accent tabular-nums [text-shadow:0_0_22px_rgb(255_210_63/0.5)] sm:text-8xl"

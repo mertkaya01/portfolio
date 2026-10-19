@@ -6,12 +6,13 @@ import { profile } from '@/data/profile'
 
 // Sections of the home page. Links go to "/#section", so they also work from a project page:
 // the router returns to "/" without reloading, and ScrollRestoration scrolls to the section.
+// Same order as the sections on the page (PortfolioPage.tsx).
 const LINKS = [
+  { hash: 'education', label: 'Education' },
+  { hash: 'experience', label: 'Experience' },
   { hash: 'projects', label: 'Projects' },
   { hash: 'skills', label: 'Skills' },
-  { hash: 'experience', label: 'Experience' },
-  { hash: 'education', label: 'Education' },
-  { hash: 'sport', label: 'Sport' },
+  { hash: 'interest', label: 'Interest' },
   { hash: 'contact', label: 'Contact' },
 ]
 

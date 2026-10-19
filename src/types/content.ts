@@ -19,6 +19,7 @@ export type Profile = {
   email: string
   links: { github: string; linkedin: string; cv: string }
   spokenLanguages: { name: string; level: string }[]
+  licenses: string[] // exactly as Mert listed them: no numbers, authorities or levels added
   volleyball: {
     years: number
     position: string
@@ -27,7 +28,7 @@ export type Profile = {
     startedIn: string
   }
   sport: { medals: number; highlights: SportHighlight[] }
-  gaming: { game: string; shortName: string; platform: string; level: number; profileUrl: string }
+  gaming: { game: string; platform: string; level: number; profileUrl: string }
 }
 
 export type SportIcon = 'volleyball' | 'medal' | 'compass' | 'math'

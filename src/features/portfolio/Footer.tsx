@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 
 import { useExperience } from '@/app/experienceStore'
 import { profile } from '@/data/profile'
@@ -28,9 +28,9 @@ export function Footer() {
           <button type="button" onClick={replay} className="hover:text-accent">
             Replay the quest ↺
           </button>
-          <a href="#top" className="hover:text-accent">
+          <Link to={{ hash: 'top' }} className="hover:text-accent">
             Back to top ↑
-          </a>
+          </Link>
         </div>
       </div>
     </footer>

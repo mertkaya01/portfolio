@@ -65,9 +65,9 @@ export function Landing() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [inView, send])
 
-  // A real link, so it still works as a plain "jump to #about" if anything else fails
+  // A real link (it still works without JavaScript, or opened in a new tab), but the click is
+  // handled here: a plain "#about" jump would be undone by the router's scroll restoration
   function onSkipClick(e: MouseEvent) {
-    if (useExperience.getState().state.name !== 'LANDING') return
     e.preventDefault()
     skip()
   }

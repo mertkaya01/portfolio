@@ -1,8 +1,10 @@
 import { useState, type CSSProperties } from 'react'
+import { Link } from 'react-router'
 
 import { Reveal } from '@/components/ui/Reveal'
 import { Section } from '@/components/ui/Section'
 import { skillGroups } from '@/data/skills'
+import { projectPath } from '@/features/projects/labels'
 import { projectShortTitle } from '@/lib/projects'
 import type { Skill, SkillGroup } from '@/types/content'
 
@@ -29,7 +31,7 @@ export function SkillsSection() {
   return (
     <Section
       id="skills"
-      index="02"
+      index="04"
       kicker="Toolbox"
       title="Skills & Technologies"
       intro="The tools I build with, grouped by area. Under each one are the projects where I used it — no self-rated percentages."
@@ -169,12 +171,13 @@ function SkillRow({ skill, inColumns }: { skill: Skill; inColumns: boolean }) {
                   ·
                 </span>
               )}
-              <a
-                href={`#project-${slug}`}
+              <Link
+                to={projectPath(slug)}
+                viewTransition
                 className="transition-colors hover:text-(color:--tone) focus-visible:text-(color:--tone)"
               >
                 {projectShortTitle.get(slug)}
-              </a>
+              </Link>
             </span>
           ))}
         </p>

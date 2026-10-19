@@ -14,7 +14,7 @@ const KIND_LABEL: Record<Education['kind'], string> = {
 
 export function EducationSection() {
   return (
-    <Section id="education" index="04" kicker="Where I've studied" title="Education">
+    <Section id="education" index="01" kicker="Where I've studied" title="Education">
       <div className="grid gap-6 lg:grid-cols-3">
         {education.map((school, i) => (
           <Reveal key={school.school} delay={i * 80} className="h-full">
