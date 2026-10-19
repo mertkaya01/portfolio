@@ -15,7 +15,7 @@ type Props = {
 // label fades in → title slides up from behind a mask → court line draws → intro rises
 export function Section({ id, index, kicker, title, intro, children }: Props) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-20 py-20 sm:py-28">
+    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-20 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <Reveal>
           <p className="font-mono text-xs tracking-[0.3em] text-muted uppercase">

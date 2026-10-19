@@ -15,7 +15,7 @@ export function HeroSection() {
       tabIndex={-1}
       className="scroll-mt-20 outline-none"
     >
-      <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-[1.25fr_1fr] lg:py-28">
+      <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 pt-20 pb-12 sm:px-6 lg:grid-cols-[1.25fr_1fr] lg:pt-28 lg:pb-16">
         <Reveal>
           <p className="font-mono text-xs tracking-[0.3em] text-muted uppercase">
             {profile.headline}

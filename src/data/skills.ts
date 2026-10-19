@@ -49,11 +49,13 @@ export const skillGroups: SkillGroup[] = [
       { name: 'Python', evidence: ['exam-verification-engine', 'data-analysis-engine'] },
       { name: 'OpenCV', evidence: ['exam-verification-engine'] },
       { name: 'LLM tool calling · agents', evidence: ['hotel-ai-concierge'] },
+      { name: 'Hugging Face / OpenAI API' },
+      { name: 'PyTorch / TensorFlow' },
     ],
   },
   {
     title: 'Data & Search',
-    summary: 'Full-text search and relational databases.',
+    summary: 'Full-text search, relational and NoSQL databases.',
     color: 'sand',
     skills: [
       { name: 'Apache Solr', evidence: ['hotel-commerce-service'] },
@@ -62,6 +64,7 @@ export const skillGroups: SkillGroup[] = [
         evidence: ['marketplace', 'hotel-commerce-service', 'data-analysis-engine'],
       },
       { name: 'Pandas', evidence: ['data-analysis-engine'] },
+      { name: 'MongoDB / DynamoDB' },
     ],
   },
   {
@@ -115,11 +118,14 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     title: 'Other languages',
-    summary: 'Languages I know at a beginner level.',
+    summary: 'More languages and platforms — beginner level where noted.',
     color: 'slate',
     skills: [
       { name: 'C · C++', detail: 'Beginner level' },
       { name: 'R', detail: 'Beginner level' },
+      { name: 'Linux', evidence: ['capstone-secure-network'] },
+      { name: 'SQL', evidence: ['marketplace', 'hotel-commerce-service', 'data-analysis-engine'] },
+      { name: 'Arduino' },
     ],
   },
   {
