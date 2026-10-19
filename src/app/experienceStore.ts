@@ -41,6 +41,9 @@ function initialState(): ExperienceState {
 
 type ExperienceStore = {
   state: ExperienceState
+  // Which way the last step went: 1 = forward (Next), -1 = back. The stage uses it to slide
+  // the next set in from the right, or the previous one back in from the left.
+  direction: 1 | -1
   send: (event: ExperienceEvent) => void
 }
 
@@ -49,11 +52,12 @@ type ExperienceStore = {
 // without re-rendering React.)
 export const useExperience = create<ExperienceStore>((set) => ({
   state: initialState(),
+  direction: 1,
   send: (event) =>
     set((store) => {
       const next = transition(store.state, event, QUEST_SHAPE)
       if (next === store.state) return store // nothing changed → no re-render
       if (next.name === 'PORTFOLIO') remember()
-      return { state: next }
+      return { state: next, direction: event.type === 'PREV' ? -1 : 1 }
     }),
 }))

@@ -1,21 +1,28 @@
-import type { ComponentType } from 'react'
+import { lazy, type ComponentType } from 'react'
 
 import { chapters } from '@/data/quest'
 import type { ChapterId } from '@/types/content'
 
-import { PlaceholderChapter } from '../chapters/PlaceholderChapter'
+import type { ArtProps } from './types'
 
-import type { ChapterProps } from './types'
+type ArtModule = { default: ComponentType<ArtProps> }
 
-// Which component draws each chapter. They all start as the placeholder; Milestones 10–14
-// each replace one line here with the real scene (high school court, exam night, …).
-const SCENES: Record<ChapterId, ComponentType<ChapterProps>> = {
-  highschool: PlaceholderChapter,
-  exam: PlaceholderChapter,
-  university: PlaceholderChapter,
-  erasmus: PlaceholderChapter,
-  now: PlaceholderChapter,
+// Which file draws each set's art. `import()` (a dynamic import) makes Vite put every set's
+// art in its own small file, downloaded only when that set is about to be played — so the
+// pixel sprites, the ASCII renderer and later three.js never slow down the first visit.
+// Milestones 8–12 each replace one placeholder file with the real scene.
+const ART: Record<ChapterId, () => Promise<ArtModule>> = {
+  highschool: () => import('../chapters/highschool/HighSchoolArt'),
+  exam: () => import('../chapters/exam/ExamArt'),
+  university: () => import('../chapters/university/UniversityArt'),
+  erasmus: () => import('../chapters/erasmus/ErasmusArt'),
+  now: () => import('../chapters/now/TieBreakArt'),
 }
 
-// The chapters in order, each with its scene. Content comes from data/quest.ts.
-export const questChapters = chapters.map((chapter) => ({ chapter, Scene: SCENES[chapter.id] }))
+// The sets in order, each with its text (data/quest.ts) and its art.
+// - Art: a lazy component — React shows the panel empty for a moment if the file isn't here yet
+// - preload: starts the download early (the stage calls it for the current and the next set)
+export const questChapters = chapters.map((chapter) => {
+  const load = ART[chapter.id]
+  return { chapter, Art: lazy(load), preload: load }
+})

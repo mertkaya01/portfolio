@@ -1,3 +1,4 @@
+import { AnimatePresence, m, useReducedMotion, type Variants } from 'motion/react'
 import { useCallback, useEffect, useRef, type MouseEvent, type SyntheticEvent } from 'react'
 
 import type { ExperienceState } from '@/app/experienceMachine'
@@ -8,6 +9,7 @@ import { FinalePlaceholder } from '../finale/FinalePlaceholder'
 import { questChapters } from './chapters'
 import { ControlsBar } from './ControlsBar'
 import { ScoreboardHUD } from './ScoreboardHUD'
+import { SetScene } from './SetScene'
 import { TransitionView } from './TransitionView'
 import { useQuestInput } from './useQuestInput'
 import { useSwipe } from './useSwipe'
@@ -21,12 +23,26 @@ function announcement(state: ExperienceState) {
   return state.beat === 0 ? `Set ${chapter.set}, ${chapter.title}. ${line}` : line
 }
 
+// Moving between sets: the new set slides in from the side you are heading to, the old one
+// slides out the other way, both fading. `direction` (1 = Next, -1 = Back) is passed in as
+// "custom", so the same variants work both ways. With reduced motion the stage passes 0
+// instead: no movement at all, only the fade.
+const SLIDE: Variants = {
+  enter: (direction: number) => ({ x: `${direction * 6}%`, opacity: 0 }),
+  center: { x: '0%', opacity: 1 },
+  exit: (direction: number) => ({ x: `${direction * -6}%`, opacity: 0 }),
+}
+const SLIDE_TRANSITION = { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const } // ease-out-expo
+
 // The full-screen stage the quest is played on. It is a native <dialog> opened as a modal:
 // the browser then makes the page behind it inert (no focus, no clicks, hidden from screen
 // readers) — a focus trap for free. It stays open through the transition, then disappears.
 export function QuestStage() {
   const state = useExperience((s) => s.state)
+  const direction = useExperience((s) => s.direction)
   const send = useExperience((s) => s.send)
+  // reduced motion: the sets cross-fade in place (0 = no slide)
+  const slide = useReducedMotion() ? 0 : direction
   const dialogRef = useRef<HTMLDialogElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
 
@@ -77,6 +93,15 @@ export function QuestStage() {
   }
 
   const current = state.name === 'QUEST' ? questChapters[state.chapter] : undefined
+  const chapterIndex = state.name === 'QUEST' ? state.chapter : -1
+
+  // Download this set's art and the next one's while the visitor reads, so a set never
+  // arrives with an empty panel (calling the same import twice costs nothing)
+  useEffect(() => {
+    if (chapterIndex < 0) return
+    questChapters[chapterIndex]?.preload()
+    questChapters[chapterIndex + 1]?.preload()
+  }, [chapterIndex])
 
   return (
     <dialog
@@ -102,16 +127,33 @@ export function QuestStage() {
             <ScoreboardHUD state={state} onSkip={skip} />
 
             <div onClick={onSceneClick} className="relative min-h-0 flex-1 overflow-hidden">
-              {current ? (
-                // key: a new set mounts a fresh scene, so its entrance plays again
-                <current.Scene
-                  key={current.chapter.id}
-                  chapter={current.chapter}
-                  beat={state.name === 'QUEST' ? state.beat : 0}
-                />
-              ) : (
-                <FinalePlaceholder onSpike={spike} />
-              )}
+              {/* AnimatePresence keeps the leaving set on screen until its exit has played.
+                  key = the set: changing lines inside a set doesn't slide, changing sets does.
+                  initial={false}: the first set doesn't slide in (the stage fades in instead). */}
+              <AnimatePresence initial={false} custom={slide}>
+                <m.div
+                  key={current?.chapter.id ?? 'finale'}
+                  custom={slide}
+                  variants={SLIDE}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={SLIDE_TRANSITION}
+                  // bg-night: while a set fades it is mixed on its own, and the grain inside needs
+                  // the dark behind it in that same layer (or it shows as grey noise everywhere)
+                  className="absolute inset-0 bg-night"
+                >
+                  {current ? (
+                    <SetScene
+                      chapter={current.chapter}
+                      beat={state.name === 'QUEST' ? state.beat : 0}
+                      Art={current.Art}
+                    />
+                  ) : (
+                    <FinalePlaceholder onSpike={spike} />
+                  )}
+                </m.div>
+              </AnimatePresence>
             </div>
 
             <ControlsBar
