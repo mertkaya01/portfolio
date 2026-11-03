@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 
+import { QUEST_ENABLED } from '@/config/features'
 import { chapters } from '@/data/quest'
 
 import {
@@ -35,7 +36,8 @@ function seenThisSession() {
 // - arrived with a section link like "/#skills" → the portfolio (that section)
 // - otherwise → the landing
 function initialState(): ExperienceState {
-  if (seenThisSession() || window.location.hash) return { name: 'PORTFOLIO' }
+  // (with the quest switched off, there is nothing to play: straight to the portfolio)
+  if (!QUEST_ENABLED || seenThisSession() || window.location.hash) return { name: 'PORTFOLIO' }
   return { name: 'LANDING' }
 }
 

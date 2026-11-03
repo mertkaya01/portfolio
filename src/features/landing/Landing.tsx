@@ -5,6 +5,7 @@ import { useEffect, useRef, type MouseEvent } from 'react'
 
 import { isQuestOpen } from '@/app/experienceMachine'
 import { useExperience } from '@/app/experienceStore'
+import { QUEST_ENABLED } from '@/config/features'
 import { profile } from '@/data/profile'
 import { handlesOwnKeys, hasModifier } from '@/lib/keyboard'
 import { CourtFloor } from '@/quest/scene-kit/CourtFloor'
@@ -55,7 +56,8 @@ export function Landing() {
       if (e.key === 'Enter') {
         if (handlesOwnKeys(e.target)) return // a focused link or button does its own thing
         e.preventDefault()
-        send({ type: 'START' })
+        if (QUEST_ENABLED) send({ type: 'START' })
+        else skip() // no quest yet: Enter opens the portfolio
       } else if (e.key === 'Escape' || e.key === 's' || e.key === 'S') {
         e.preventDefault()
         skip()
@@ -131,30 +133,36 @@ export function Landing() {
           Beyond the Court
         </p>
 
-        <p className="mt-5 max-w-sm animate-rise text-sm text-light/60 [animation-delay:2500ms] sm:text-base">
-          My story so far, played as a five-set match.
-        </p>
+        {QUEST_ENABLED && (
+          <p className="mt-5 max-w-sm animate-rise text-sm text-light/60 [animation-delay:2500ms] sm:text-base">
+            My story so far, played as a five-set match.
+          </p>
+        )}
 
-        {/* The two doors */}
+        {/* The two doors (one, while the quest is switched off) */}
         <div className="mt-10 flex flex-col items-center gap-5 sm:flex-row sm:gap-6">
-          <button
-            type="button"
-            onClick={() => send({ type: 'START' })}
-            className="inline-flex animate-rise items-center gap-3 rounded-full border border-accent/60 px-6 py-3 font-mono text-xs tracking-[0.2em] text-accent uppercase transition-colors [animation-delay:2800ms] hover:bg-accent hover:text-night"
-          >
-            Start the quest
-            <kbd className="animate-breathe rounded border border-current/40 px-1.5 text-[0.65rem] [animation-delay:3700ms]">
-              Enter
-            </kbd>
-          </button>
+          {QUEST_ENABLED && (
+            <button
+              type="button"
+              onClick={() => send({ type: 'START' })}
+              className="inline-flex animate-rise items-center gap-3 rounded-full border border-accent/60 px-6 py-3 font-mono text-xs tracking-[0.2em] text-accent uppercase transition-colors [animation-delay:2800ms] hover:bg-accent hover:text-night"
+            >
+              Start the quest
+              <kbd className="animate-breathe rounded border border-current/40 px-1.5 text-[0.65rem] [animation-delay:3700ms]">
+                Enter
+              </kbd>
+            </button>
+          )}
 
           <a
             href="#about"
             onClick={onSkipClick}
             className="inline-flex animate-rise items-center gap-3 px-2 py-3 font-mono text-xs tracking-[0.2em] text-light/70 uppercase transition-colors [animation-delay:3100ms] hover:text-accent"
           >
-            Skip to portfolio
-            <kbd className="rounded border border-current/30 px-1.5 text-[0.65rem]">S</kbd>
+            {QUEST_ENABLED ? 'Skip to portfolio' : 'Enter the portfolio'}
+            <kbd className="rounded border border-current/30 px-1.5 text-[0.65rem]">
+              {QUEST_ENABLED ? 'S' : 'Enter'}
+            </kbd>
           </a>
         </div>
       </m.div>

@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router'
 
 import { useExperience } from '@/app/experienceStore'
+import { QUEST_ENABLED } from '@/config/features'
 import { profile } from '@/data/profile'
 
 // Computed once when the file loads, not on every render
@@ -25,9 +26,11 @@ export function Footer() {
         </p>
         <p>Built with React, TypeScript and Tailwind CSS</p>
         <div className="flex gap-6">
-          <button type="button" onClick={replay} className="hover:text-accent">
-            Replay the quest ↺
-          </button>
+          {QUEST_ENABLED && (
+            <button type="button" onClick={replay} className="hover:text-accent">
+              Replay the quest ↺
+            </button>
+          )}
           <Link to={{ hash: 'top' }} className="hover:text-accent">
             Back to top ↑
           </Link>

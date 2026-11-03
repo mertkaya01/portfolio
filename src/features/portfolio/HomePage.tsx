@@ -1,13 +1,18 @@
-import { useEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 
 import { isQuestOpen } from '@/app/experienceMachine'
 import { useExperience } from '@/app/experienceStore'
 import { profile } from '@/data/profile'
 import { Landing } from '@/features/landing/Landing'
+import { QUEST_ENABLED } from '@/config/features'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
-import { QuestStage } from '@/quest/engine/QuestStage'
 
 import { PortfolioPage } from './PortfolioPage'
+
+// The quest's stage is its own file, downloaded only when the quest opens
+const QuestStage = lazy(() =>
+  import('@/quest/engine/QuestStage').then((m) => ({ default: m.QuestStage })),
+)
 
 // Jump straight to the player card, without the smooth scroll
 const jumpToPortfolio = () =>
@@ -40,7 +45,11 @@ export function HomePage() {
     <>
       <Landing />
       <PortfolioPage />
-      {isQuestOpen(state) && <QuestStage />}
+      {QUEST_ENABLED && isQuestOpen(state) && (
+        <Suspense fallback={null}>
+          <QuestStage />
+        </Suspense>
+      )}
     </>
   )
 }
