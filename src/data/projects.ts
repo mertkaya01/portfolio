@@ -34,6 +34,7 @@ export const projects: Project[] = [
       'JUnit 5',
       'Mockito',
       'Vitest',
+      'Swagger / OpenAPI',
       'Vercel',
       'Render',
     ],
@@ -72,13 +73,13 @@ export const projects: Project[] = [
     ],
     limitations: [
       'Hotel photos, reviews and nightly prices are demo values (the dataset has none), so there is no price sort across all hotels.',
-      "The backend ran on Render's free tier (kept awake by a separate uptime monitor) and is offline now, so the live demo shows the front end only.",
     ],
     media: [],
     links: {
       repo: 'https://github.com/mertkaya01/Hotel-Commerce-Service',
       demo: 'https://hotel-commerce-service.vercel.app',
-      demoNote: 'Front end only — the backend is offline right now, so searches return no results.',
+      demoNote:
+        'Completed, full stack: the backend — Java 21 and Spring Boot with H2 and Apache Solr — is in the GitHub repo, and one Docker Compose command runs the whole system. The live demo currently hosts only the Angular front end.',
       related: [{ label: 'Uptime Monitor', href: '/projects/uptime-monitor' }],
     },
   },

@@ -109,9 +109,15 @@ export type Certificate = {
   file: string // PDF in public/certificates/
 }
 
-// No self-rated levels or percentages. Where a skill was used in a project, `evidence`
-// points at it (slugs from projects.ts); `detail` says what exactly was done or how much.
-export type Skill = { name: string; detail?: string; evidence?: string[] }
+// No percentages. A level in three honest steps, decided by evidence:
+// - 'hands-on': used for real, in several projects or at work
+// - 'working': used in a project, comfortable with the basics
+// - 'familiar': studied or tried, no public project yet
+export type SkillLevel = 'hands-on' | 'working' | 'familiar'
+
+// Where a skill was used, `evidence` points at the projects (slugs from projects.ts);
+// `detail` says what exactly was done or how much.
+export type Skill = { name: string; level: SkillLevel; detail?: string; evidence?: string[] }
 
 // Each group has its own muted color so the cards are easy to tell apart (--color-tone-* tokens)
 export type SkillColor =
