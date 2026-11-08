@@ -77,9 +77,6 @@ export const projects: Project[] = [
     media: [],
     links: {
       repo: 'https://github.com/mertkaya01/Hotel-Commerce-Service',
-      demo: 'https://hotel-commerce-service.vercel.app',
-      demoNote:
-        'Completed, full stack: the backend — Java 21 and Spring Boot with H2 and Apache Solr — is in the GitHub repo, and one Docker Compose command runs the whole system. The live demo currently hosts only the Angular front end.',
       related: [{ label: 'Uptime Monitor', href: '/projects/uptime-monitor' }],
     },
   },

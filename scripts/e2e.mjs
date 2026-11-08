@@ -140,13 +140,21 @@ try {
     !(await page.evaluate(() => /d+s*%/.test(document.getElementById('skills').textContent))),
   )
 
-  // Hotel Commerce: completed, honest about the demo, no "backend offline" wording
+  // Hotel Commerce: completed, code link only (no live demo any more), no "offline" wording
   const hotel = await open(DEV, '/projects/hotel-commerce-service')
-  const hotelText = await hotel.evaluate(() => document.body.textContent)
+  const hotelPage = await hotel.evaluate(() => ({
+    text: document.body.textContent,
+    demo: [...document.querySelectorAll('a')].some((a) => /live demo/i.test(a.textContent)),
+    code: [...document.querySelectorAll('a')].some((a) =>
+      a.href.includes('github.com/mertkaya01/Hotel-Commerce-Service'),
+    ),
+  }))
   check(
-    'Hotel Commerce: completed, no "offline"/"front end only" wording',
-    hotelText.includes('Completed, full stack') &&
-      !/backend is offline|Front end only —/.test(hotelText),
+    'Hotel Commerce: completed, repo link, no demo link or "offline" wording',
+    hotelPage.text.includes('Completed') &&
+      hotelPage.code &&
+      !hotelPage.demo &&
+      !/offline|front end only/i.test(hotelPage.text),
   )
   await hotel.close()
 
