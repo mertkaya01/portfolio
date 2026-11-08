@@ -49,6 +49,13 @@ function checkSlug(slug: string, where: string) {
 for (const group of skillGroups) {
   for (const skill of group.skills) {
     skill.evidence?.forEach((slug) => checkSlug(slug, `Skill "${skill.name}"`))
+    // honest levels: "hands-on" must be backed by projects or a stated detail
+    if (!['hands-on', 'working', 'familiar'].includes(skill.level)) {
+      errors.push(`Skill "${skill.name}" needs a level: hands-on, working or familiar`)
+    }
+    if (skill.level === 'hands-on' && !skill.evidence?.length && !skill.detail) {
+      errors.push(`Skill "${skill.name}" is hands-on but shows no projects or detail`)
+    }
   }
 }
 for (const job of experience) {
