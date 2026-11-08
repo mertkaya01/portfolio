@@ -2,10 +2,10 @@ import { lazy, Suspense, useEffect, useRef } from 'react'
 
 import { isQuestOpen } from '@/app/experienceMachine'
 import { useExperience } from '@/app/experienceStore'
-import { profile } from '@/data/profile'
 import { Landing } from '@/features/landing/Landing'
 import { QUEST_ENABLED } from '@/config/features'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useContent, useT } from '@/i18n'
 
 import { PortfolioPage } from './PortfolioPage'
 
@@ -20,7 +20,9 @@ const jumpToPortfolio = () =>
 
 // "/" — the landing and the portfolio below it, plus the quest stage on top while it is played.
 export function HomePage() {
-  useDocumentTitle(`${profile.name} — Beyond the Court`)
+  const t = useT()
+  const { profile } = useContent()
+  useDocumentTitle(t.meta.title(profile.name))
   const state = useExperience((s) => s.state)
   const name = state.name
 

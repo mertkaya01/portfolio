@@ -1,4 +1,4 @@
-import type { Certificate, Education } from '../types/content.ts'
+import type { Certificate, Education } from '../../types/content.ts'
 
 export const education: Education[] = [
   {

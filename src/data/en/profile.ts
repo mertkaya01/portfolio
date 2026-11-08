@@ -1,4 +1,4 @@
-import type { Profile } from '../types/content.ts'
+import type { Profile } from '../../types/content.ts'
 
 export const profile: Profile = {
   name: 'Mert Kaya',

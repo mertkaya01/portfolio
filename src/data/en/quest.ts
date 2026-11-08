@@ -1,4 +1,4 @@
-import type { Chapter } from '../types/content.ts'
+import type { Chapter } from '../../types/content.ts'
 
 /*
   The five "sets" of the quest. Each beat is one short line shown on its own,

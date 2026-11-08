@@ -1,6 +1,6 @@
 import { lazy, type ComponentType } from 'react'
 
-import { chapters } from '@/data/quest'
+import { chapters } from '@/data/en/quest'
 import type { ChapterId } from '@/types/content'
 
 import type { ArtProps } from './types'

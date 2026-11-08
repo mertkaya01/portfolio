@@ -3,6 +3,9 @@ import { useCallback, useEffect, useRef, type MouseEvent, type SyntheticEvent } 
 
 import type { ExperienceState } from '@/app/experienceMachine'
 import { useExperience } from '@/app/experienceStore'
+import { useContent, useT } from '@/i18n'
+import type { Messages } from '@/i18n/messages/en'
+import type { Chapter } from '@/types/content'
 
 import { FinalePlaceholder } from '../finale/FinalePlaceholder'
 
@@ -15,12 +18,12 @@ import { useQuestInput } from './useQuestInput'
 import { useSwipe } from './useSwipe'
 
 // What a screen reader announces at each step
-function announcement(state: ExperienceState) {
-  if (state.name === 'FINALE') return 'Match point. Press Space, click or tap to spike.'
+function announcement(state: ExperienceState, chapters: Chapter[], t: Messages) {
+  if (state.name === 'FINALE') return t.quest.announceFinale
   if (state.name !== 'QUEST') return ''
-  const { chapter } = questChapters[state.chapter]
+  const chapter = chapters[state.chapter]
   const line = chapter.beats[state.beat]
-  return state.beat === 0 ? `Set ${chapter.set}, ${chapter.title}. ${line}` : line
+  return state.beat === 0 ? t.quest.announceSet(chapter.set, chapter.title, line) : line
 }
 
 // Moving between sets: the new set slides in from the side you are heading to, the old one
@@ -41,6 +44,8 @@ export function QuestStage() {
   const state = useExperience((s) => s.state)
   const direction = useExperience((s) => s.direction)
   const send = useExperience((s) => s.send)
+  const t = useT()
+  const { chapters } = useContent() // the sets' text in the current language
   // reduced motion: the sets cross-fade in place (0 = no slide)
   const slide = useReducedMotion() ? 0 : direction
   const dialogRef = useRef<HTMLDialogElement>(null)
@@ -106,7 +111,7 @@ export function QuestStage() {
   return (
     <dialog
       ref={dialogRef}
-      aria-label={`The quest — the story in ${questChapters.length} sets`}
+      aria-label={t.quest.dialog(questChapters.length)}
       onCancel={onCancel}
       className="m-0 size-full max-h-none max-w-none overflow-hidden border-0 bg-transparent p-0 text-light backdrop:bg-transparent"
     >
@@ -145,7 +150,7 @@ export function QuestStage() {
                 >
                   {current ? (
                     <SetScene
-                      chapter={current.chapter}
+                      chapter={chapters[chapterIndex]}
                       beat={state.name === 'QUEST' ? state.beat : 0}
                       Art={current.Art}
                     />
@@ -167,7 +172,7 @@ export function QuestStage() {
         )}
 
         <p aria-live="polite" className="sr-only">
-          {announcement(state)}
+          {announcement(state, chapters, t)}
         </p>
       </div>
     </dialog>

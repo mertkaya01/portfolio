@@ -3,6 +3,7 @@ import { Outlet, ScrollRestoration, useLocation } from 'react-router'
 
 import { Backdrop } from '@/components/Backdrop'
 import { Footer } from '@/features/portfolio/Footer'
+import { useDocumentLanguage } from '@/i18n'
 
 // The site has `scroll-behavior: smooth` so section links glide. But when the page itself
 // changes, the router's "back to the top" (or "back to where you were") would glide too — and
@@ -28,6 +29,7 @@ function InstantScrollOnPageChange() {
 // ScrollRestoration: new page → start at the top (or at the #section in the URL);
 // browser back → return to where you were.
 export function RootLayout() {
+  useDocumentLanguage() // <html lang> and the meta description follow the chosen language
   return (
     <>
       <Backdrop />

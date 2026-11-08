@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 import { QUEST_ENABLED } from '@/config/features'
-import { chapters } from '@/data/quest'
+import { chapters } from '@/data/en/quest'
 
 import {
   transition,

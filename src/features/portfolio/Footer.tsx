@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router'
 
 import { useExperience } from '@/app/experienceStore'
 import { QUEST_ENABLED } from '@/config/features'
-import { profile } from '@/data/profile'
+import { useContent, useT } from '@/i18n'
 
 // Computed once when the file loads, not on every render
 const YEAR = new Date().getFullYear()
@@ -11,6 +11,8 @@ export function Footer() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const send = useExperience((s) => s.send)
+  const t = useT()
+  const { profile } = useContent()
 
   // Play the quest again — from a project page too: go home first, the stage opens there
   function replay() {
@@ -24,15 +26,15 @@ export function Footer() {
         <p>
           © {YEAR} {profile.name}
         </p>
-        <p>Built with React, TypeScript and Tailwind CSS</p>
+        <p>{t.footer.builtWith}</p>
         <div className="flex gap-6">
           {QUEST_ENABLED && (
             <button type="button" onClick={replay} className="hover:text-accent">
-              Replay the quest ↺
+              {t.footer.replay}
             </button>
           )}
           <Link to={{ hash: 'top' }} className="hover:text-accent">
-            Back to top ↑
+            {t.footer.backToTop}
           </Link>
         </div>
       </div>

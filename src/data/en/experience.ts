@@ -1,4 +1,4 @@
-import type { Experience } from '../types/content.ts'
+import type { Experience } from '../../types/content.ts'
 
 // Newest first. Bullets come from the CV; keep them factual.
 export const experience: Experience[] = [

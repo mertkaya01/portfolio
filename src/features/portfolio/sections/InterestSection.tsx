@@ -1,32 +1,29 @@
 import { ButtonLink } from '@/components/ui/ButtonLink'
 import { Reveal } from '@/components/ui/Reveal'
 import { Section } from '@/components/ui/Section'
-import { profile } from '@/data/profile'
+import { content } from '@/data'
+import { useContent, useT } from '@/i18n'
 import { initials } from '@/lib/format'
 import type { SportIcon } from '@/types/content'
 
-const { volleyball, sport, gaming, name } = profile
-
-// Four separate statistics. Each gets a one-line note (from the same profile data), so
-// "16", "9" and "2017" read as three different things — not as a date.
-const STATS = [
-  { label: 'Medals', value: String(sport.medals), note: 'Sports & math competitions' },
-  { label: 'Seasons', value: String(volleyball.years), note: 'Competitive volleyball' },
-  { label: 'Since', value: volleyball.startedIn, note: 'First season' },
-  { label: 'Position', value: initials(volleyball.position), note: volleyball.position },
-]
+// The position as volleyball notation writes it everywhere, in any language: Outside Hitter → OH
+const POSITION_CODE = initials(content.en.profile.volleyball.position)
 
 // FACEIT shows level 10 in red
 const FACEIT_LEVEL_10 = '#fe1f00'
 
 export function InterestSection() {
+  const t = useT()
+  const { profile } = useContent()
+  const { sport, gaming } = profile
+
   return (
     <Section
       id="interest"
       index="05"
-      kicker="Beyond the court"
-      title="Interest"
-      intro={`${sport.medals} medals in total — from inter-school tournaments, orienteering and athletics to math competitions.`}
+      kicker={t.interest.kicker}
+      title={t.interest.title}
+      intro={t.interest.intro(sport.medals)}
     >
       <Reveal>
         <Scoreboard />
@@ -63,14 +60,14 @@ export function InterestSection() {
           </span>
           <div>
             <p className="font-mono text-[0.65rem] tracking-[0.2em] text-muted uppercase">
-              Off the court
+              {t.interest.offCourt}
             </p>
             <p className="mt-1 text-light/85">
-              {gaming.game} · {gaming.platform} Level {gaming.level}
+              {gaming.game} · {gaming.platform} {t.interest.level} {gaming.level}
             </p>
           </div>
           <ButtonLink href={gaming.profileUrl} variant="link" className="sm:ml-auto">
-            {gaming.platform} profile
+            {t.interest.profile(gaming.platform)}
           </ButtonLink>
         </div>
       </Reveal>
@@ -78,8 +75,19 @@ export function InterestSection() {
   )
 }
 
-// An arena scoreboard: a header strip, then the LED digits
+// An arena scoreboard: a header strip, then four separate statistics. Each gets a one-line
+// note, so "16", "9" and "2017" read as three different things — not as a date.
 function Scoreboard() {
+  const t = useT()
+  const { profile } = useContent()
+  const { volleyball, sport, name } = profile
+  const stats = [
+    { label: t.interest.medals, value: String(sport.medals), note: t.interest.medalsNote },
+    { label: t.interest.seasons, value: String(volleyball.years), note: t.interest.seasonsNote },
+    { label: t.interest.since, value: volleyball.startedIn, note: t.interest.sinceNote },
+    { label: t.interest.position, value: POSITION_CODE, note: volleyball.position },
+  ]
+
   return (
     <div className="overflow-hidden rounded-2xl border border-light/15 bg-black/60">
       <div className="flex items-center justify-between gap-4 border-b border-light/10 px-6 py-3 font-mono text-[0.65rem] tracking-[0.3em] text-muted uppercase">
@@ -87,7 +95,7 @@ function Scoreboard() {
           {/* two "power" lights, like on a real scoreboard */}
           <span aria-hidden="true" className="size-1.5 rounded-full bg-accent" />
           <span aria-hidden="true" className="size-1.5 rounded-full bg-accent/40" />
-          Scoreboard
+          {t.interest.scoreboard}
         </span>
         <span>
           #{volleyball.jerseyNumber} · {name}
@@ -96,7 +104,7 @@ function Scoreboard() {
 
       {/* Each statistic is its own LED panel, with space around it: four separate numbers */}
       <dl className="grid grid-cols-2 gap-3 p-3 sm:gap-4 sm:p-4 lg:grid-cols-4">
-        {STATS.map((stat) => (
+        {stats.map((stat) => (
           <div
             key={stat.label}
             className="rounded-xl border border-light/10 bg-night px-5 py-5 sm:px-6"
