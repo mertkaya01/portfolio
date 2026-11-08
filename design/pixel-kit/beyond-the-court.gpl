@@ -1,0 +1,36 @@
+GIMP Palette
+Name: Beyond the Court
+Columns: 8
+#
+ 10  11  13	ink
+ 20  26  51	night
+ 59  42  90	dusk
+122  59 107	plum
+196  82  74	coral
+232 131  74	orange
+246 178 107	peach
+255 210  63	sun (site accent)
+255 233 168	glow
+230 237 245	white
+138 147 160	grey
+ 32  36  46	slate
+ 29  43  74	sea
+ 47  79 107	teal
+125 211 252	sky
+214  58  47	flag red
+201 139  82	wood (site)
+138  90  54	plank
+226 184 120	parquet light
+198  90  58	terracotta
+143  59  40	terracotta dark
+239 225 196	cream
+201 184 150	cream shadow
+140 192 232	day sky
+ 47  90 168	court blue
+ 31  58 120	deep blue
+217 154 134	salmon wall
+240 196 160	skin light
+211 154 116	skin mid
+156 106  78	skin shadow
+ 58  36  24	hair
+ 79 122  58	green

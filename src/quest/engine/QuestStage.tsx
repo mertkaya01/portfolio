@@ -148,6 +148,7 @@ export function QuestStage() {
                       chapter={current.chapter}
                       beat={state.name === 'QUEST' ? state.beat : 0}
                       Art={current.Art}
+                      layout={current.layout}
                     />
                   ) : (
                     <FinalePlaceholder onSpike={spike} />

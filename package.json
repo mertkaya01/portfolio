@@ -12,7 +12,8 @@
     "format:check": "prettier --check .",
     "content:check": "node scripts/check-content.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "art:drafts": "node scripts/export-pixel-art.mjs"
   },
   "dependencies": {
     "@fontsource-variable/big-shoulders": "^5.3.0",
