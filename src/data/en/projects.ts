@@ -1,4 +1,4 @@
-import type { Project } from '../types/content.ts'
+import type { Project } from '../../types/content.ts'
 
 /*
   To add a project: copy one object, change the fields, done. The UI picks it up.

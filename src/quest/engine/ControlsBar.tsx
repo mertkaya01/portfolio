@@ -1,3 +1,5 @@
+import { useT } from '@/i18n'
+
 type Props = {
   finale: boolean
   beat: number // current line inside the set (0-based)
@@ -12,16 +14,17 @@ const BUTTON =
 // The bottom bar: Back, how far into this set you are, Next.
 // Every action also has a key, but the buttons make it work without a keyboard.
 export function ControlsBar({ finale, beat, beats, onPrev, onNext }: Props) {
+  const t = useT()
   return (
     <footer className="flex items-center justify-between gap-4 border-t border-light/10 bg-black/50 px-4 py-3 sm:px-6">
       <button type="button" onClick={onPrev} className={BUTTON}>
-        <span aria-hidden="true">←</span> Back
+        <span aria-hidden="true">←</span> {t.quest.back}
       </button>
 
       {finale ? (
         <p className="font-mono text-[0.7rem] tracking-[0.15em] text-muted uppercase">
-          <span className="hidden sm:inline">Space, click or tap to spike</span>
-          <span className="sm:hidden">Tap to spike</span>
+          <span className="hidden sm:inline">{t.quest.spikeHint}</span>
+          <span className="sm:hidden">{t.quest.spikeHintTouch}</span>
         </p>
       ) : (
         <div className="flex items-center gap-4">
@@ -36,7 +39,7 @@ export function ControlsBar({ finale, beat, beats, onPrev, onNext }: Props) {
             ))}
           </span>
           <span className="hidden font-mono text-[0.65rem] tracking-[0.15em] text-muted uppercase md:inline">
-            ← → or swipe
+            {t.quest.moveHint}
           </span>
         </div>
       )}
@@ -46,7 +49,7 @@ export function ControlsBar({ finale, beat, beats, onPrev, onNext }: Props) {
         <span aria-hidden="true" className="w-[5.5rem]" />
       ) : (
         <button type="button" onClick={onNext} className={BUTTON}>
-          Next <span aria-hidden="true">→</span>
+          {t.quest.next} <span aria-hidden="true">→</span>
         </button>
       )}
     </footer>

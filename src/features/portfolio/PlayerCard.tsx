@@ -1,12 +1,15 @@
 import { useState, type ReactNode } from 'react'
 
 import { Sheen } from '@/components/ui/Sheen'
-import { profile } from '@/data/profile'
 import { TILT_STYLE, useTilt } from '@/hooks/useTilt'
+import { useContent, useT } from '@/i18n'
+import type { Profile } from '@/types/content'
 
-const { volleyball } = profile
-const [role, ...focusAreas] = profile.headline.split(' · ') // "Computer Engineer", then the focus areas
-const focus = focusAreas.join(' · ') // "Backend & Full-stack · Applied AI"
+// "Computer Engineer · Backend & Full-stack · Applied AI" → the role, then the focus areas
+function splitHeadline(profile: Profile) {
+  const [role, ...focusAreas] = profile.headline.split(' · ')
+  return { role, focus: focusAreas.join(' · ') }
+}
 
 // The profile card. Front: photo, name, role, focus, availability. Back: a "scouting report".
 // (It started as a volleyball trading card; the sport now stays in the details.)
@@ -14,6 +17,7 @@ const focus = focusAreas.join(' · ') // "Backend & Full-stack · Applied AI"
 export function PlayerCard() {
   const [flipped, setFlipped] = useState(false)
   const { ref: tiltRef, onPointerMove, onPointerLeave } = useTilt<HTMLDivElement>(12)
+  const t = useT()
 
   return (
     <div className="w-full max-w-[22rem]">
@@ -45,7 +49,7 @@ export function PlayerCard() {
         className="mx-auto mt-5 flex items-center gap-2 font-mono text-xs tracking-[0.2em] text-muted uppercase transition-colors hover:text-accent"
       >
         <span aria-hidden="true">↻</span>
-        {flipped ? 'Show front' : 'Flip · scouting report'}
+        {flipped ? t.card.front : t.card.flip}
       </button>
     </div>
   )
@@ -61,6 +65,9 @@ const FACE =
   'absolute inset-0 flex flex-col overflow-hidden rounded-2xl border shadow-2xl shadow-black/60 backface-hidden'
 
 function CardFront({ hidden }: { hidden: boolean }) {
+  const t = useT()
+  const { profile } = useContent()
+  const { role, focus } = splitHeadline(profile)
   return (
     <div aria-hidden={hidden} className={`${FACE} border-light/15 bg-night`}>
       <CourtLines />
@@ -93,11 +100,11 @@ function CardFront({ hidden }: { hidden: boolean }) {
 
             <div className="absolute inset-x-0 top-0 flex items-start justify-between p-4">
               <span className="font-mono text-[0.6rem] tracking-[0.3em] text-light/75 uppercase">
-                Beyond the Court
+                {t.card.tag}
               </span>
               {/* the volleyball side stays, quietly: an outlined tag, not a bright badge */}
               <span className="rounded border border-light/25 bg-night/60 px-2 py-1 font-mono text-[0.6rem] tracking-[0.15em] text-light/85 uppercase backdrop-blur-sm">
-                {volleyball.position}
+                {profile.volleyball.position}
               </span>
             </div>
           </div>
@@ -129,21 +136,25 @@ function CardFront({ hidden }: { hidden: boolean }) {
 }
 
 function CardBack({ hidden }: { hidden: boolean }) {
+  const t = useT()
+  const { profile } = useContent()
+  const { volleyball } = profile
+  const { focus } = splitHeadline(profile)
   const languages = profile.spokenLanguages.map((l) => `${l.name} (${l.level})`).join(' · ')
 
   return (
     <div aria-hidden={hidden} className={`${FACE} rotate-y-180 border-accent/30 bg-shadow p-6`}>
       <Sheen />
       <p className="relative font-mono text-xs tracking-[0.3em] text-accent uppercase">
-        Scouting report
+        {t.card.scouting}
       </p>
       <dl className="relative mt-5 space-y-3 text-sm">
-        <Row term="Position">{volleyball.positionNote}</Row>
-        <Row term="Off court">{focus}</Row>
-        <Row term="Languages">{languages}</Row>
-        <Row term="Looking for">{profile.lookingFor.join(' · ')}</Row>
-        <Row term="Licenses & certifications">{profile.licenses.join(' · ')}</Row>
-        <Row term="Based in">{profile.location}</Row>
+        <Row term={t.card.position}>{volleyball.positionNote}</Row>
+        <Row term={t.card.offCourt}>{focus}</Row>
+        <Row term={t.card.languages}>{languages}</Row>
+        <Row term={t.card.lookingFor}>{profile.lookingFor.join(' · ')}</Row>
+        <Row term={t.card.licenses}>{profile.licenses.join(' · ')}</Row>
+        <Row term={t.card.basedIn}>{profile.location}</Row>
       </dl>
       <p className="relative mt-auto font-display text-2xl font-extrabold uppercase">
         #{volleyball.jerseyNumber} · {profile.name}

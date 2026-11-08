@@ -4,12 +4,5 @@ import { ArtPlaceholder } from '../ArtPlaceholder'
 // The art of this set. A placeholder for now; the real scene arrives in M9.
 // Default export: the registry loads this file on its own, only when it is needed.
 export default function ExamArt(props: ArtProps) {
-  return (
-    <ArtPlaceholder
-      {...props}
-      style="Pencil sketch"
-      idea="Optical forms, filled in pencil, one bubble at a time."
-      milestone="M9"
-    />
-  )
+  return <ArtPlaceholder {...props} set="exam" milestone="M9" />
 }

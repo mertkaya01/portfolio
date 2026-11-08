@@ -155,8 +155,10 @@ function ferry(b: Buffer, t: number) {
 }
 
 export const istanbulShot: Shot = {
-  label:
-    'Pixel art: the Istanbul skyline at sunset, the sun sinking into the sea, a ferry crossing.',
+  label: {
+    en: 'Pixel art: the Istanbul skyline at sunset, the sun sinking into the sea, a ferry crossing.',
+    tr: 'Pixel art: gün batımında İstanbul silueti, güneş denize iniyor, bir vapur karşıya geçiyor.',
+  },
   background: '/art/set1/shot1/background.png',
   over: (b, t) => {
     glitter(b, t)

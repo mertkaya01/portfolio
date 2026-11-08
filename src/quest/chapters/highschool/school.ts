@@ -245,7 +245,10 @@ function bouncingBall(b: Buffer, t: number) {
 }
 
 export const schoolShot: Shot = {
-  label: 'Pixel art: the high school at golden hour — a kid passing a volleyball in the yard.',
+  label: {
+    en: 'Pixel art: the high school at golden hour — a kid passing a volleyball in the yard.',
+    tr: 'Pixel art: altın saatte lise — bahçede bir çocuk voleybol topuyla manşet çalışıyor.',
+  },
   background: '/art/set1/shot2/background.png',
   under: shadow,
   sheets: [

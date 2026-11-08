@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 
+import { useT } from '@/i18n'
 import { isExternal } from '@/lib/format'
 
 type Variant = 'accent' | 'outline' | 'link'
@@ -29,6 +30,7 @@ export function ButtonLink({
   newTab = false,
   className = '',
 }: Props) {
+  const t = useT()
   const external = isExternal(href) || newTab
   const classes = `inline-flex items-center gap-2 font-mono text-xs font-semibold tracking-[0.15em] uppercase transition-colors ${VARIANTS[variant]} ${className}`
 
@@ -55,7 +57,7 @@ export function ButtonLink({
       {external && (
         <>
           <span aria-hidden="true">↗</span>
-          <span className="sr-only">(opens in a new tab)</span>
+          <span className="sr-only">{t.common.newTab}</span>
         </>
       )}
     </a>

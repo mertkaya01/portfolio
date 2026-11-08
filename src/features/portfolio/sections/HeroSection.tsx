@@ -1,12 +1,14 @@
 import { ButtonLink } from '@/components/ui/ButtonLink'
 import { Chip } from '@/components/ui/Chip'
 import { Reveal } from '@/components/ui/Reveal'
-import { profile } from '@/data/profile'
+import { useContent, useT } from '@/i18n'
 
 import { PlayerCard } from '../PlayerCard'
 
 // The first thing after the landing: who I am in three sentences, plus the player card
 export function HeroSection() {
+  const t = useT()
+  const { profile } = useContent()
   return (
     // tabIndex -1: after the quest, keyboard focus lands here (by script only, never by Tab)
     <section
@@ -24,12 +26,13 @@ export function HeroSection() {
             id="about-title"
             className="mt-4 font-display text-6xl font-black tracking-tight uppercase sm:text-7xl"
           >
-            Hi, I'm Mert<span className="text-accent">.</span>
+            {t.hero.hello}
+            <span className="text-accent">.</span>
           </h2>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-light/80">{profile.summary}</p>
 
           <p className="mt-8 font-mono text-[0.7rem] tracking-[0.25em] text-muted uppercase">
-            Looking for
+            {t.hero.lookingFor}
           </p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {profile.lookingFor.map((role) => (
@@ -41,10 +44,10 @@ export function HeroSection() {
 
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <ButtonLink href="#projects" variant="accent">
-              See projects
+              {t.hero.seeProjects}
             </ButtonLink>
             <ButtonLink href={profile.links.cv} download="Mert-Kaya-CV.pdf">
-              Download CV ↓
+              {t.common.downloadCv}
             </ButtonLink>
             <ButtonLink href={profile.links.github} variant="link" className="px-2">
               GitHub

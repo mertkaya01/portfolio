@@ -4,25 +4,28 @@ import { Link, useParams } from 'react-router'
 import { ButtonLink } from '@/components/ui/ButtonLink'
 import { DrawLine, MaskReveal, Reveal } from '@/components/ui/Reveal'
 import { TiltCard } from '@/components/ui/TiltCard'
-import { profile } from '@/data/profile'
-import { projects } from '@/data/projects'
 import { NotFoundPage } from '@/features/not-found/NotFoundPage'
 import { Nav } from '@/features/portfolio/Nav'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useContent, useT } from '@/i18n'
 import { isRealLink } from '@/lib/todo'
 import type { FeaturedProject, Link as ContentLink, Project } from '@/types/content'
 
-import { CONTEXT_LABEL, projectPath, STATUS_LABEL } from './labels'
+import { projectPath } from './labels'
 import { Badges, Stack } from './ProjectBits'
 
 // "/projects/:slug" — one page per project. Featured projects get the full case study;
 // the others get a short page with their summary, stack and links.
 export function ProjectPage() {
   const { slug } = useParams() // the ":slug" part of the URL
+  const t = useT()
+  const { projects, profile } = useContent()
   const index = projects.findIndex((p) => p.slug === slug)
   const project = projects[index] as Project | undefined
 
-  useDocumentTitle(`${project?.title ?? 'Out of bounds'} — ${profile.name}`)
+  useDocumentTitle(
+    project ? `${project.title} — ${profile.name}` : t.errors.notFoundTitle(profile.name),
+  )
 
   if (!project) return <NotFoundPage />
 
@@ -41,7 +44,7 @@ export function ProjectPage() {
             viewTransition
             className="font-mono text-xs tracking-[0.2em] text-muted uppercase transition-colors hover:text-accent"
           >
-            ← All projects
+            {t.projectPage.allProjects}
           </Link>
         </Reveal>
 
@@ -52,8 +55,7 @@ export function ProjectPage() {
         ) : (
           <Reveal>
             <p className="mt-16 max-w-2xl border-l-2 border-wood/40 pl-5 text-light/60">
-              A smaller project — no full case study for this one. The code and the summary above
-              tell the story.
+              {t.projectPage.smallProject}
             </p>
           </Reveal>
         )}
@@ -67,6 +69,7 @@ export function ProjectPage() {
 
 function Header({ project }: { project: Project }) {
   const { links } = project
+  const t = useT()
 
   return (
     <header className="mt-10">
@@ -83,10 +86,10 @@ function Header({ project }: { project: Project }) {
 
       <Reveal delay={400}>
         <dl className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-light/10 bg-light/10 sm:grid-cols-2 lg:grid-cols-4">
-          <Fact term="My role">{project.role}</Fact>
-          <Fact term="When">{project.period}</Fact>
-          <Fact term="Context">{CONTEXT_LABEL[project.context]}</Fact>
-          <Fact term="Status">{STATUS_LABEL[project.status]}</Fact>
+          <Fact term={t.projects.myRole}>{project.role}</Fact>
+          <Fact term={t.projectPage.when}>{project.period}</Fact>
+          <Fact term={t.projectPage.context}>{t.projects.context[project.context]}</Fact>
+          <Fact term={t.projectPage.status}>{t.projects.status[project.status]}</Fact>
         </dl>
       </Reveal>
 
@@ -94,13 +97,17 @@ function Header({ project }: { project: Project }) {
         <div className="mt-8 flex flex-wrap items-center gap-3">
           {isRealLink(links.repo) && (
             <ButtonLink href={links.repo} variant="accent">
-              View code
+              {t.projectPage.viewCode}
             </ButtonLink>
           )}
-          {isRealLink(links.demo) && <ButtonLink href={links.demo}>Live demo</ButtonLink>}
-          {isRealLink(links.paper) && <ButtonLink href={links.paper}>Paper</ButtonLink>}
+          {isRealLink(links.demo) && (
+            <ButtonLink href={links.demo}>{t.projects.liveDemo}</ButtonLink>
+          )}
+          {isRealLink(links.paper) && (
+            <ButtonLink href={links.paper}>{t.projects.paper}</ButtonLink>
+          )}
           {!isRealLink(links.repo) && !isRealLink(links.demo) && (
-            <span className="font-mono text-xs text-muted">Code not public</span>
+            <span className="font-mono text-xs text-muted">{t.projectPage.codeNotPublic}</span>
           )}
         </div>
         {isRealLink(links.demo) && links.demoNote && (
@@ -128,21 +135,20 @@ function Fact({ term, children }: { term: string; children: ReactNode }) {
 
 // The full story of a featured project, in numbered blocks
 function CaseStudy({ project }: { project: FeaturedProject }) {
+  const t = useT()
   return (
     <div className="mt-24 space-y-24">
       <div className="grid gap-16 lg:grid-cols-2">
-        <Block index="01" title="The problem">
+        <Block index="01" title={t.projectPage.problem}>
           <p className="text-lg leading-relaxed text-light/80">{project.problem}</p>
         </Block>
-        <Block index="02" title="What I built">
+        <Block index="02" title={t.projectPage.built}>
           <p className="text-lg leading-relaxed text-light/80">{project.solution}</p>
         </Block>
       </div>
 
-      <Block index="03" title="Key decisions">
-        <p className="-mt-4 mb-8 max-w-2xl text-light/60">
-          The engineering choices behind it — and why I made them.
-        </p>
+      <Block index="03" title={t.projectPage.decisions}>
+        <p className="-mt-4 mb-8 max-w-2xl text-light/60">{t.projectPage.decisionsIntro}</p>
         <ol className="grid gap-5 md:grid-cols-2">
           {project.decisions.map((decision, i) => (
             <li key={decision.title}>
@@ -167,14 +173,14 @@ function CaseStudy({ project }: { project: FeaturedProject }) {
       </Block>
 
       <div className="grid gap-16 lg:grid-cols-2">
-        <Block index="04" title="Highlights">
+        <Block index="04" title={t.projectPage.highlights}>
           <ul className="list-disc space-y-3 pl-5 leading-relaxed text-light/80 marker:text-wood">
             {project.highlights.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
         </Block>
-        <Block index="05" title="Honest limitations">
+        <Block index="05" title={t.projectPage.limitations}>
           <ul className="space-y-3 leading-relaxed text-light/65">
             {project.limitations.map((item) => (
               <li key={item} className="border-l-2 border-light/15 pl-4">
@@ -208,12 +214,15 @@ function Block({ index, title, children }: { index: string; title: string; child
 
 // "See also" links: other project pages stay inside the app, outside links open a new tab
 function Related({ links = [] }: { links?: ContentLink[] }) {
+  const t = useT()
   if (links.length === 0) return null
 
   return (
     <Reveal>
       <div className="mt-24 border-t border-light/10 pt-8">
-        <p className="font-mono text-xs tracking-[0.3em] text-muted uppercase">See also</p>
+        <p className="font-mono text-xs tracking-[0.3em] text-muted uppercase">
+          {t.projectPage.seeAlso}
+        </p>
         <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
           {links.map((link) => (
             <li key={link.href}>
@@ -239,10 +248,11 @@ function Related({ links = [] }: { links?: ContentLink[] }) {
 }
 
 function Pager({ previous, next }: { previous: Project; next: Project }) {
+  const t = useT()
   return (
-    <nav aria-label="More projects" className="mt-24 grid gap-5 sm:grid-cols-2">
-      <PagerCard project={previous} label="← Previous" />
-      <PagerCard project={next} label="Next →" alignRight />
+    <nav aria-label={t.projectPage.moreProjects} className="mt-24 grid gap-5 sm:grid-cols-2">
+      <PagerCard project={previous} label={t.projectPage.previous} />
+      <PagerCard project={next} label={t.projectPage.next} alignRight />
     </nav>
   )
 }

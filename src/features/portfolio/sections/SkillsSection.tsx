@@ -3,61 +3,59 @@ import { Link } from 'react-router'
 
 import { Reveal } from '@/components/ui/Reveal'
 import { Section } from '@/components/ui/Section'
-import { experience } from '@/data/experience'
-import { skillGroups } from '@/data/skills'
-import { CONTEXT_LABEL, projectPath } from '@/features/projects/labels'
+import { projectPath } from '@/features/projects/labels'
+import { useContent, useT } from '@/i18n'
 import { projectBySlug } from '@/lib/projects'
-import type { Skill, SkillGroup, SkillLevel } from '@/types/content'
+import type { Experience, Skill, SkillGroup, SkillLevel } from '@/types/content'
 
 const ALL = 'all'
-const TOTAL = skillGroups.reduce((sum, g) => sum + g.skills.length, 0)
 
 // The three honest levels, from most to least experience (see SkillLevel in types/content.ts)
-const LEVELS: { level: SkillLevel; label: string; hint: string }[] = [
-  { level: 'hands-on', label: 'Hands-on', hint: 'used in several projects or at work' },
-  { level: 'working', label: 'Working', hint: 'used in a project' },
-  { level: 'familiar', label: 'Familiar', hint: 'studied or tried, no public project yet' },
-]
-const LEVEL_LABEL = Object.fromEntries(LEVELS.map((l) => [l.level, l.label])) as Record<
-  SkillLevel,
-  string
->
+const LEVELS: readonly SkillLevel[] = ['hands-on', 'working', 'familiar']
 
 // The group's muted color as a CSS variable: classes like text-(color:--tone) read it
 const toneOf = (group: SkillGroup) =>
   ({ '--tone': `var(--color-tone-${group.color})` }) as CSSProperties
 
 // Where a skill was used at work: jobs whose projects include one of the skill's projects
-const jobsFor = (skill: Skill) =>
+const jobsFor = (skill: Skill, experience: Experience[]) =>
   experience.filter((job) => skill.evidence?.some((slug) => job.projectSlugs.includes(slug)))
 
 // All groups in one calm grid (3 columns on desktop, 2 on tablet, 1 on mobile). Each row is
 // a technology and its level; click it to see where and how it was used. The filter row above
 // shows one group at a time — all data comes from skills.ts, projects.ts and experience.ts.
+// (The filter remembers a group by its colour, which is the same in every language.)
 export function SkillsSection() {
+  const t = useT()
+  const { skillGroups } = useContent()
   const [filter, setFilter] = useState<string>(ALL)
-  const shown = filter === ALL ? skillGroups : skillGroups.filter((g) => g.title === filter)
+  const shown = filter === ALL ? skillGroups : skillGroups.filter((g) => g.color === filter)
   const single = shown.length === 1
   const count = shown.reduce((sum, g) => sum + g.skills.length, 0)
+  const total = skillGroups.reduce((sum, g) => sum + g.skills.length, 0)
 
   return (
     <Section
       id="skills"
       index="04"
-      kicker="Toolbox"
-      title="Skills & Technologies"
-      intro="The tools I build with, grouped by area, each with an honest level instead of a percentage. Open one to see where I used it."
+      kicker={t.skills.kicker}
+      title={t.skills.title}
+      intro={t.skills.intro}
     >
       <Reveal>
-        <div role="group" aria-label="Filter skills by area" className="flex flex-wrap gap-2">
-          <FilterButton label="All" active={filter === ALL} onClick={() => setFilter(ALL)} />
+        <div role="group" aria-label={t.skills.filter} className="flex flex-wrap gap-2">
+          <FilterButton
+            label={t.skills.all}
+            active={filter === ALL}
+            onClick={() => setFilter(ALL)}
+          />
           {skillGroups.map((group) => (
             <FilterButton
-              key={group.title}
+              key={group.color}
               label={group.title}
               group={group}
-              active={filter === group.title}
-              onClick={() => setFilter(group.title)}
+              active={filter === group.color}
+              onClick={() => setFilter(group.color)}
             />
           ))}
         </div>
@@ -69,8 +67,8 @@ export function SkillsSection() {
             className="font-mono text-[0.7rem] tracking-[0.15em] text-muted uppercase"
           >
             {filter === ALL
-              ? `${skillGroups.length} areas · ${TOTAL} technologies`
-              : `${filter} · ${count} technologies`}
+              ? t.skills.countAll(skillGroups.length, total)
+              : t.skills.countGroup(shown[0]?.title ?? '', count)}
           </p>
           {/* What the levels mean */}
           <dl
@@ -78,12 +76,12 @@ export function SkillsSection() {
             style={{ '--tone': 'var(--color-accent)' } as CSSProperties}
             className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-light/55"
           >
-            {LEVELS.map(({ level, label, hint }) => (
+            {LEVELS.map((level) => (
               <div key={level} className="flex items-center gap-2">
                 <dt>
-                  <LevelTag level={level} label={label} />
+                  <LevelTag level={level} />
                 </dt>
-                <dd>{hint}</dd>
+                <dd>{t.skills.levels[level].hint}</dd>
               </div>
             ))}
           </dl>
@@ -95,7 +93,7 @@ export function SkillsSection() {
         <div key={filter} className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {shown.map((group, i) => (
             <div
-              key={group.title}
+              key={group.color}
               className={`animate-fade-in ${single ? 'md:col-span-2 lg:col-span-3' : ''}`}
               style={{ animationDelay: `${Math.min(i, 5) * 40}ms` }}
             >
@@ -133,7 +131,8 @@ function FilterButton({ label, group, active, onClick }: FilterProps) {
 // with a small label. Easy to compare at a glance; no percentages.
 const DOTS: Record<SkillLevel, number> = { 'hands-on': 3, working: 2, familiar: 1 }
 
-function LevelTag({ level, label }: { level: SkillLevel; label: string }) {
+function LevelTag({ level }: { level: SkillLevel }) {
+  const t = useT()
   return (
     <span className="inline-flex items-center gap-2 whitespace-nowrap">
       <span aria-hidden="true" className="flex gap-1">
@@ -147,13 +146,14 @@ function LevelTag({ level, label }: { level: SkillLevel; label: string }) {
       <span
         className={`font-mono text-[0.6rem] tracking-[0.12em] uppercase ${level === 'hands-on' ? 'text-light/80' : 'text-muted'}`}
       >
-        {label}
+        {t.skills.levels[level].label}
       </span>
     </span>
   )
 }
 
 function SkillCard({ group, wide }: { group: SkillGroup; wide: boolean }) {
+  const t = useT()
   return (
     <article
       style={toneOf(group)}
@@ -174,10 +174,10 @@ function SkillCard({ group, wide }: { group: SkillGroup; wide: boolean }) {
           <p className="mt-3 text-sm leading-relaxed text-light/60">{group.summary}</p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5 font-mono text-[0.65rem] tracking-[0.15em] uppercase">
-          {group.main && <span className="text-(color:--tone)">Core</span>}
+          {group.main && <span className="text-(color:--tone)">{t.skills.core}</span>}
           <span className="text-muted">
             {group.skills.length}
-            <span className="sr-only"> technologies</span>
+            <span className="sr-only">{t.skills.technologies}</span>
           </span>
         </div>
       </header>
@@ -199,17 +199,19 @@ function SkillCard({ group, wide }: { group: SkillGroup; wide: boolean }) {
 // One technology: its name and level. If there is more to tell (where it was used, or a
 // detail), the row is a button that opens a short panel below it.
 function SkillRow({ skill }: { skill: Skill }) {
+  const t = useT()
+  const { experience } = useContent()
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const evidence = skill.evidence ?? []
-  const jobs = jobsFor(skill)
+  const jobs = jobsFor(skill, experience)
   const hasMore = evidence.length > 0 || !!skill.detail
 
   const headline = (
     <>
       <span className="text-[0.95rem] font-medium text-light">{skill.name}</span>
       <span className="ml-auto flex shrink-0 items-center gap-2">
-        <LevelTag level={skill.level} label={LEVEL_LABEL[skill.level]} />
+        <LevelTag level={skill.level} />
         {hasMore && (
           <span
             aria-hidden="true"
@@ -243,7 +245,7 @@ function SkillRow({ skill }: { skill: Skill }) {
           {skill.detail && <p className="text-sm leading-relaxed text-light/65">{skill.detail}</p>}
           {jobs.length > 0 && (
             <p className="mt-2 text-sm text-light/65">
-              At work: {jobs.map((job) => `${job.role} · ${job.company}`).join(', ')}
+              {t.skills.atWork} {jobs.map((job) => `${job.role} · ${job.company}`).join(', ')}
             </p>
           )}
           {evidence.length > 0 && (
@@ -261,7 +263,7 @@ function SkillRow({ skill }: { skill: Skill }) {
                       {project.shortTitle}
                     </Link>
                     <span className="font-mono text-[0.65rem] tracking-[0.1em] text-muted uppercase">
-                      {CONTEXT_LABEL[project.context]}
+                      {t.projects.context[project.context]}
                     </span>
                   </li>
                 )

@@ -6,7 +6,7 @@ import { useEffect, useRef, type MouseEvent } from 'react'
 import { isQuestOpen } from '@/app/experienceMachine'
 import { useExperience } from '@/app/experienceStore'
 import { QUEST_ENABLED } from '@/config/features'
-import { profile } from '@/data/profile'
+import { useContent, useT } from '@/i18n'
 import { handlesOwnKeys, hasModifier } from '@/lib/keyboard'
 import { CourtFloor } from '@/quest/scene-kit/CourtFloor'
 import { Grain } from '@/quest/scene-kit/Grain'
@@ -33,6 +33,8 @@ function skip() {
 export function Landing() {
   const ref = useRef<HTMLElement>(null)
   const send = useExperience((s) => s.send)
+  const t = useT()
+  const { profile } = useContent()
 
   // 0 while the landing fills the screen → 1 once it has scrolled completely out of view
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
@@ -78,7 +80,7 @@ export function Landing() {
     <section
       ref={ref}
       id="top"
-      aria-label="Intro"
+      aria-label={t.landing.label}
       // isolate: the scene layers below (-z-10) stay inside this section, under the text.
       // pb: the content sits a little above the middle, leaving the floor to the court.
       className="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden px-4 pb-[16vh] text-center"
@@ -124,18 +126,18 @@ export function Landing() {
 
       <m.div style={{ y, scale, opacity }} className="flex flex-col items-center">
         <p className="animate-rise font-mono text-xs tracking-[0.4em] text-muted uppercase [animation-delay:300ms]">
-          Portfolio · 2026
+          {t.landing.kicker}
         </p>
 
         <FlyInTitle name={profile.name.toUpperCase()} start={NAME_START} gap={LETTER_GAP} />
 
         <p className="mt-4 animate-track-in text-base tracking-[0.3em] text-wood uppercase [animation-delay:1900ms] sm:text-lg">
-          Beyond the Court
+          {t.landing.tagline}
         </p>
 
         {QUEST_ENABLED && (
           <p className="mt-5 max-w-sm animate-rise text-sm text-light/60 [animation-delay:2500ms] sm:text-base">
-            My story so far, played as a five-set match.
+            {t.landing.subtitle}
           </p>
         )}
 
@@ -147,7 +149,7 @@ export function Landing() {
               onClick={() => send({ type: 'START' })}
               className="inline-flex animate-rise items-center gap-3 rounded-full border border-accent/60 px-6 py-3 font-mono text-xs tracking-[0.2em] text-accent uppercase transition-colors [animation-delay:2800ms] hover:bg-accent hover:text-night"
             >
-              Start the quest
+              {t.landing.start}
               <kbd className="animate-breathe rounded border border-current/40 px-1.5 text-[0.65rem] [animation-delay:3700ms]">
                 Enter
               </kbd>
@@ -159,7 +161,7 @@ export function Landing() {
             onClick={onSkipClick}
             className="inline-flex animate-rise items-center gap-3 px-2 py-3 font-mono text-xs tracking-[0.2em] text-light/70 uppercase transition-colors [animation-delay:3100ms] hover:text-accent"
           >
-            {QUEST_ENABLED ? 'Skip to portfolio' : 'Enter the portfolio'}
+            {QUEST_ENABLED ? t.landing.skip : t.landing.enter}
             <kbd className="rounded border border-current/30 px-1.5 text-[0.65rem]">
               {QUEST_ENABLED ? 'S' : 'Enter'}
             </kbd>

@@ -1,41 +1,34 @@
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router'
 
 import { DrawLine, MaskReveal, Reveal } from '@/components/ui/Reveal'
-import { profile } from '@/data/profile'
 import { Nav } from '@/features/portfolio/Nav'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { useContent, useT } from '@/i18n'
 
 // Any unknown URL: in volleyball terms, the ball landed out
 export function NotFoundPage() {
-  useDocumentTitle(`Out of bounds — ${profile.name}`)
+  const t = useT()
+  const { profile } = useContent()
+  useDocumentTitle(t.errors.notFoundTitle(profile.name))
 
-  return (
-    <Screen
-      code="404"
-      title="Out!"
-      message="The ball landed outside the court — this page doesn't exist."
-    />
-  )
+  return <Screen code="404" title={t.errors.notFound} message={t.errors.notFoundMessage} />
 }
 
 // A page crashed while rendering. Shown instead of a blank screen.
 export function RouteErrorPage() {
   const error = useRouteError()
-  useDocumentTitle(`Timeout — ${profile.name}`)
+  const t = useT()
+  const { profile } = useContent()
+  useDocumentTitle(t.errors.errorTitle(profile.name))
 
   if (isRouteErrorResponse(error) && error.status === 404) return <NotFoundPage />
   if (import.meta.env.DEV) console.error(error) // show the real error while developing
 
-  return (
-    <Screen
-      code="ERR"
-      title="Timeout"
-      message="Something went wrong on this page. Let's reset and go back to the court."
-    />
-  )
+  return <Screen code="ERR" title={t.errors.error} message={t.errors.errorMessage} />
 }
 
 function Screen({ code, title, message }: { code: string; title: string; message: string }) {
+  const t = useT()
   return (
     <>
       <Nav />
@@ -63,7 +56,7 @@ function Screen({ code, title, message }: { code: string; title: string; message
             viewTransition
             className="mt-10 inline-flex rounded-full bg-accent px-6 py-3 font-mono text-xs font-semibold tracking-[0.15em] text-night uppercase transition-colors hover:bg-light"
           >
-            Back to the court
+            {t.errors.back}
           </Link>
         </Reveal>
       </main>

@@ -119,8 +119,10 @@ function players(b: Buffer, t: number) {
 }
 
 export const firstMatchShot: Shot = {
-  label:
-    'Pixel art: a school gym — the libero dives, and the ball lands just past his hands. The other team celebrates.',
+  label: {
+    en: 'Pixel art: a school gym — the libero dives, and the ball lands just past his hands. The other team celebrates.',
+    tr: 'Pixel art: bir okul spor salonu — libero topa uzanıyor, top elinin hemen ötesine düşüyor. Rakip takım sevinçle kutluyor.',
+  },
   background: '/art/set1/shot3/background.png',
   over: (b, t) => {
     players(b, t)

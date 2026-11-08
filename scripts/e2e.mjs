@@ -207,6 +207,82 @@ try {
   check('phone: Start opens the quest', q.open)
   check('no console errors (phone)', phone.problems.length === 0, phone.problems.join(' | '))
   await phone.close()
+
+  // Turkish: the switch in the nav, everything translated, remembered after a reload
+  const trPage = await open(DEV)
+  await trPage.evaluate(() => document.querySelector('nav button[lang="tr"]').click())
+  await sleep(400)
+  const trHome = await trPage.evaluate(() => ({
+    lang: document.documentElement.lang,
+    title: document.title,
+    nav: [...document.querySelectorAll('nav[aria-label] ul a')].map((a) => a.textContent).join(','),
+    skills: document.getElementById('skills-title')?.textContent,
+    dates: document.getElementById('experience').textContent,
+    text: document.querySelector('main').textContent,
+    meta: document.querySelector('meta[name="description"]').content,
+  }))
+  check(
+    'TR: html lang and meta description switch',
+    trHome.lang === 'tr' && trHome.meta.includes('Bilgisayar Mühendisi'),
+  )
+  check(
+    'TR: nav in Turkish',
+    trHome.nav === 'Eğitim,Deneyim,Projeler,Yetenekler,İlgi Alanları,İletişim',
+    trHome.nav,
+  )
+  check(
+    'TR: sections and dates in Turkish',
+    trHome.skills === 'Yetenekler ve Teknolojiler' &&
+      /Tem 2026/.test(trHome.dates) &&
+      /\d ay/.test(trHome.dates),
+    `${trHome.skills} · ${trHome.dates.slice(0, 120)}`,
+  )
+  const leftovers = [
+    'Looking for',
+    'Case study',
+    'Skills & Technologies',
+    'Where I',
+    'Download CV',
+    'Scouting report',
+    'Open to new',
+    'Built here',
+    'Medals',
+  ].filter((phrase) => trHome.text.includes(phrase))
+  check(
+    'TR: no English interface text left on the page',
+    leftovers.length === 0,
+    leftovers.join(' | '),
+  )
+  await trPage.reload({ waitUntil: 'networkidle0' })
+  await sleep(400)
+  check(
+    'TR: the choice survives a reload',
+    (await trPage.evaluate(() => document.documentElement.lang)) === 'tr',
+  )
+  const trProject = await open(DEV, '/projects/hotel-commerce-service')
+  const trProjectText = await trProject.evaluate(() => document.body.textContent)
+  check(
+    'TR: project page in Turkish',
+    trProjectText.includes('Koda bak') &&
+      trProjectText.includes('Önemli kararlar') &&
+      trProjectText.includes('Tamamlandı'),
+  )
+  await trProject.close()
+  await trPage.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
+  await sleep(300)
+  await trPage.keyboard.press('Enter')
+  await sleep(400)
+  check(
+    'TR: the quest in Turkish',
+    (await quest(trPage)).hud.includes('Lise'),
+    (await quest(trPage)).hud,
+  )
+  await trPage.keyboard.press('Escape')
+  await sleep(1600)
+  check('no console errors (Turkish)', trPage.problems.length === 0, trPage.problems.join(' | '))
+  // back to English for anything that runs after this
+  await trPage.evaluate(() => localStorage.removeItem('beyond-the-court:locale'))
+  await trPage.close()
 } finally {
   await dev.close()
 }

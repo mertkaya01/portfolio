@@ -1,4 +1,4 @@
-import type { SkillGroup } from '../types/content.ts'
+import type { SkillGroup } from '../../types/content.ts'
 
 // Grouped by area. Every skill has an honest level (see SkillLevel in types/content.ts):
 // 'hands-on' only where several projects or the internship back it up, 'working' for one

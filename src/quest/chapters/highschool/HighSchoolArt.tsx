@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 
+import { useLocale } from '../../../i18n/locale'
 import type { ArtProps } from '../../engine/types'
 
 import { aydinShot } from './aydin'
@@ -76,6 +77,7 @@ function compose(out: Buffer, shot: Shot, t: number) {
 export default function HighSchoolArt({ beat }: ArtProps) {
   const boxRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const locale = useLocale((s) => s.locale)
   const index = Math.min(beat, SHOTS.length - 1)
   const indexRef = useRef(index) // read by the drawing loop, which runs outside React
   useEffect(() => {
@@ -174,7 +176,7 @@ export default function HighSchoolArt({ beat }: ArtProps) {
         width={FULL.w}
         height={FULL.h}
         role="img"
-        aria-label={SHOTS[index].label}
+        aria-label={SHOTS[index].label[locale]}
         // no smoothing when the browser scales the canvas up: square, sharp pixels
         className="max-w-none shrink-0 [image-rendering:pixelated]"
       />

@@ -5,15 +5,17 @@ import { Link } from 'react-router'
 import { Chip } from '@/components/ui/Chip'
 import { Reveal } from '@/components/ui/Reveal'
 import { Section } from '@/components/ui/Section'
-import { experience } from '@/data/experience'
 import { projectPath } from '@/features/projects/labels'
-import { profile } from '@/data/profile'
+import { useContent, useLocale, useT } from '@/i18n'
 import { formatDuration, formatRange } from '@/lib/format'
 import { projectTitle } from '@/lib/projects'
 
 // A vertical timeline, newest on top. The rail is the "court line" motif again:
 // it fills up as you scroll through it, and each job's light switches on as you reach it.
 export function ExperienceSection() {
+  const t = useT()
+  const locale = useLocale((s) => s.locale)
+  const { experience, profile } = useContent()
   const timelineRef = useRef<HTMLDivElement>(null)
   // 0 when the timeline's top reaches 75% of the screen → 1 when its end reaches 60%
   const { scrollYProgress } = useScroll({
@@ -22,7 +24,7 @@ export function ExperienceSection() {
   })
 
   return (
-    <Section id="experience" index="02" kicker="Where I've worked" title="Experience">
+    <Section id="experience" index="02" kicker={t.experience.kicker} title={t.experience.title}>
       <div ref={timelineRef} className="relative ml-1.5">
         {/* The rail, and the part of it you have already "played" */}
         <span aria-hidden="true" className="absolute inset-y-0 left-0 w-px bg-wood/20" />
@@ -43,9 +45,11 @@ export function ExperienceSection() {
               <span className="relative inline-flex size-3 rounded-full bg-go" />
             </span>
             <Reveal>
-              <p className="font-mono text-xs tracking-[0.2em] text-go uppercase">Now</p>
+              <p className="font-mono text-xs tracking-[0.2em] text-go uppercase">
+                {t.experience.now}
+              </p>
               <h3 className="mt-2 font-display text-3xl font-extrabold tracking-tight uppercase">
-                Looking for my next team
+                {t.experience.nowTitle}
               </h3>
               <p className="mt-2 text-light/70">{profile.lookingFor.join(' · ')}</p>
             </Reveal>
@@ -57,8 +61,8 @@ export function ExperienceSection() {
               <Reveal>
                 <div className="rounded-2xl border border-light/10 bg-night/40 p-6 transition-colors hover:border-wood/40 sm:p-8">
                   <p className="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs tracking-[0.2em] text-muted uppercase">
-                    <span>{formatRange(job.start, job.end)}</span>
-                    <Chip tone="wood">{formatDuration(job.start, job.end)}</Chip>
+                    <span>{formatRange(job.start, job.end, locale)}</span>
+                    <Chip tone="wood">{formatDuration(job.start, job.end, locale)}</Chip>
                     <span>{job.location}</span>
                   </p>
                   <h3 className="mt-3 font-display text-3xl font-extrabold tracking-tight uppercase">
@@ -70,7 +74,7 @@ export function ExperienceSection() {
                     ))}
                   </ul>
                   {job.stack.length > 0 && (
-                    <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Technologies">
+                    <ul className="mt-5 flex flex-wrap gap-1.5" aria-label={t.common.technologies}>
                       {job.stack.map((item) => (
                         <li key={item}>
                           <Chip>{item}</Chip>
@@ -81,7 +85,7 @@ export function ExperienceSection() {
                   {job.projectSlugs.length > 0 && (
                     <p className="mt-5 text-sm leading-relaxed text-muted">
                       <span className="font-mono text-[0.65rem] tracking-[0.2em] uppercase">
-                        Built here ·{' '}
+                        {t.experience.builtHere} ·{' '}
                       </span>
                       {job.projectSlugs.map((slug, i) => (
                         <span key={slug}>

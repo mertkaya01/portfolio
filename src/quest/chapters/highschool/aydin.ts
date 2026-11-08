@@ -131,8 +131,10 @@ function rally(b: Buffer, time: number) {
 }
 
 export const aydinShot: Shot = {
-  label:
-    'Pixel art: Aydın 2020 — number 1, a middle blocker, blocks the spike at the net and the team celebrates.',
+  label: {
+    en: 'Pixel art: Aydın 2020 — number 1, a middle blocker, blocks the spike at the net and the team celebrates.',
+    tr: 'Pixel art: Aydın 2020 — 1 numaralı orta oyuncu filede smaçı blokluyor, takım sevinçle kutluyor.',
+  },
   background: '/art/set1/shot4/background.png',
   over: rally,
   still: 0.66, // the ball against the block

@@ -1,3 +1,5 @@
+import type { Locale } from '../../../i18n/locale'
+
 import type { Buffer } from './pixel'
 
 // One shot of Set 1 = one line of the story. Layers are drawn in this order:
@@ -16,7 +18,7 @@ export type SheetLayer = {
 }
 
 export type Shot = {
-  label: string // what a screen reader hears
+  label: Record<Locale, string> // what a screen reader hears, in each language
   background: string
   under?: (b: Buffer, t: number) => void // t = seconds since the shot appeared
   sheets?: SheetLayer[]
