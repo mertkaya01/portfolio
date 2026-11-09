@@ -70,6 +70,13 @@ export const C = {
   green: color('#4f7a3a'),
   skin: color('#d39a74'),
   hair: color('#3a2418'),
+  // the water jug of the dispenser in Mert's room (after his drawing of a 19 L jug)
+  water: color('#a0d0f0'),
+  waterLight: color('#c0e0f0'),
+  waterDeep: color('#50b0e0'),
+  // leaves: three greens for trees and bushes
+  leafLight: color('#7db04f'),
+  leafDark: color('#2f5a2c'),
 }
 
 export function pset(b: Buffer, x: number, y: number, c: number) {
@@ -262,8 +269,13 @@ const DARKER = new Map<number, number>([
   [C.sea, C.night],
   [C.sky, C.teal],
   [C.sun, C.orange],
-  [C.green, C.slate],
+  [C.leafLight, C.green],
+  [C.green, C.leafDark],
+  [C.leafDark, C.slate],
   [C.skin, C.plank],
+  [C.waterLight, C.water],
+  [C.water, C.waterDeep],
+  [C.waterDeep, C.teal],
 ])
 export const darker = (c: number) => DARKER.get(c) ?? c
 
@@ -309,6 +321,25 @@ export function dissolve(out: Buffer, from: Buffer, to: Buffer, progress: number
     for (let x = 0; x < out.w; x++) {
       const i = y * out.w + x
       out.data[i] = dither(x, y, progress, from.data[i], to.data[i])
+    }
+  }
+}
+
+// Every pixel one shade darker (the palette's own darker neighbour): a room before its
+// lights come on. Call it twice for two steps.
+export function darkenAll(b: Buffer) {
+  for (let i = 0; i < b.data.length; i++) b.data[i] = darker(b.data[i])
+}
+
+// A camera moving in: `src` seen `scale` times bigger, centred on the point (fx, fy) of `src`.
+// Every pixel of `out` takes the nearest pixel of `src` — so the pixels grow into big blocks,
+// the way old games zoomed.
+export function zoom(out: Buffer, src: Buffer, fx: number, fy: number, scale: number) {
+  for (let y = 0; y < out.h; y++) {
+    const sy = Math.min(src.h - 1, Math.max(0, Math.floor(fy + (y + 0.5 - out.h / 2) / scale)))
+    for (let x = 0; x < out.w; x++) {
+      const sx = Math.min(src.w - 1, Math.max(0, Math.floor(fx + (x + 0.5 - out.w / 2) / scale)))
+      out.data[y * out.w + x] = src.data[sy * src.w + sx]
     }
   }
 }

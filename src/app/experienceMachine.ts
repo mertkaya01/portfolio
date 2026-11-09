@@ -11,7 +11,7 @@
 
 export type ExperienceState =
   | { name: 'LANDING' }
-  | { name: 'QUEST'; chapter: number; beat: number } // which set, which line inside it (0-based)
+  | { name: 'QUEST'; chapter: number; beat: number } // which set, which step in it (0 = its scoreboard)
   | { name: 'FINALE' } // match point: the spike
   | { name: 'TRANSITION'; kind: 'skip' | 'spike' } // the short animation into the portfolio
   | { name: 'PORTFOLIO' }
@@ -24,7 +24,8 @@ export type ExperienceEvent =
   | { type: 'SPIKE' }
   | { type: 'TRANSITION_DONE' }
 
-// The only thing the rules need to know about the content: how many beats each chapter has
+// The only thing the rules need to know about the content: how many steps each set has
+// (its scoreboard + its scenes — quest/engine/steps.ts)
 export type QuestShape = readonly number[]
 
 export function transition(

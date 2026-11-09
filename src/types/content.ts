@@ -136,10 +136,17 @@ export type SkillGroup = {
 
 export type ChapterId = 'highschool' | 'exam' | 'university' | 'erasmus' | 'now'
 
+// One scene of a set: a picture with one short line under it
+export type QuestScene = {
+  id: string // which drawing goes with this line — the set's art looks it up by this id
+  caption: string // one breath long
+  duration?: number // ms on screen when the quest plays by itself (default: from the length)
+}
+
 export type Chapter = {
   id: ChapterId
   set: 1 | 2 | 3 | 4 | 5
-  title: string // shown on the scoreboard: "SET 2 · THE EXAM"
-  period: string
-  beats: string[] // short lines revealed one by one inside the chapter
+  title: string // shown on the scoreboard: "SET 2 · UNIVERSITY EXAM"
+  period: string // shown on the scoreboard under the title
+  scenes: QuestScene[] // played after the set's scoreboard, one by one
 }

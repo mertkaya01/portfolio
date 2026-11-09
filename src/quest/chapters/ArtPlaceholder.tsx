@@ -18,7 +18,7 @@ const CORNERS = [
 
 // A temporary art panel, like an empty frame on a storyboard: which style is coming, the idea
 // of the scene, and which "shot" (line of the set) we are on. Each set's real art replaces it.
-export function ArtPlaceholder({ set, milestone, beat, beats }: Props) {
+export function ArtPlaceholder({ set, milestone, chapter, scene }: Props) {
   const t = useT()
   const { style, idea } = t.quest.art.sets[set]
   return (
@@ -40,7 +40,7 @@ export function ArtPlaceholder({ set, milestone, beat, beats }: Props) {
       <p className="mt-3 max-w-xs text-sm leading-relaxed text-light/55">{idea}</p>
 
       <p className="absolute right-6 bottom-5 font-mono text-[0.6rem] tracking-[0.25em] text-muted uppercase">
-        {t.quest.art.shot(beat + 1, beats)}
+        {t.quest.art.shot(scene + 1, chapter.scenes.length)}
       </p>
     </div>
   )

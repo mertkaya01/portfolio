@@ -178,15 +178,28 @@ export const tr: Messages = {
     skip: 'Geç',
     back: 'Geri',
     next: 'İleri',
+    pause: 'Duraklat',
+    play: 'Oynat',
     moveHint: '← → ya da kaydır',
     spikeHint: 'Smaç için Space, tıkla ya da dokun',
     spikeHintTouch: 'Smaç için dokun',
-    announceSet: (set, title, line) => `Set ${set}, ${title}. ${line}`,
+    announceSet: (set, title, period) => `Set ${set}, ${title}, ${period}.`,
+    scoreboardArt: (set, title, period) =>
+      `Pixel art: salonun skorbordu yanıyor — Set ${set}, ${title}, ${period}.`,
+    accepted: { programme: 'Bilgisayar Mühendisliği', school: 'İstanbul Kültür Üniversitesi' },
+    arenaScoreboard: (set, title, period) =>
+      `3D: gece bir salon, dev ekranında skorbord — Set ${set}, ${title}, ${period}.`,
+    vectorScoreboard: (set, title, period) =>
+      `Düz illüstrasyon: yıldız halkalı bir skorbord kartı — Set ${set}, ${title}, ${period}.`,
+    asciiScoreboard: (set, title, period) =>
+      `ASCII: bir terminal skorbordu yazdırıyor — Set ${set}, ${title}, ${period}.`,
+    sketchScoreboard: (set, title, period) =>
+      `Karakalem: elle çizilmiş bir skorbord — Set ${set}, ${title}, ${period}.`,
     announceFinale: 'Maç sayısı. Smaç için Space’e bas, tıkla ya da dokun.',
     finale: {
       kicker: 'Set 5 · Tie-break',
       title: 'Maç sayısı',
-      text: 'Son bir top kaldı. Smaçı kendin zamanlayacağın 3D saha çok yakında. Şimdilik sayıyı al.',
+      text: 'Son bir top kaldı. Smaçı vur — portfolyo açılsın.',
       spike: 'Smaçı vur',
     },
     art: {

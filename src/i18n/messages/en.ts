@@ -177,15 +177,30 @@ export const en = {
     skip: 'Skip',
     back: 'Back',
     next: 'Next',
+    pause: 'Pause',
+    play: 'Play',
     moveHint: '← → or swipe',
     spikeHint: 'Space, click or tap to spike',
     spikeHintTouch: 'Tap to spike',
-    announceSet: (set: number, title: string, line: string) => `Set ${set}, ${title}. ${line}`,
+    announceSet: (set: number, title: string, period: string) => `Set ${set}, ${title}, ${period}.`,
+    // what a screen reader hears for a scoreboard drawn as a picture
+    scoreboardArt: (set: number, title: string, period: string) =>
+      `Pixel art: the arena scoreboard lights up — Set ${set}, ${title}, ${period}.`,
+    // Set 2's last scene: the line on the results page (facts from the education data)
+    accepted: { programme: 'Computer Engineering', school: 'Istanbul Kültür University' },
+    arenaScoreboard: (set: number, title: string, period: string) =>
+      `3D: an arena at night, its big screen showing the scoreboard — Set ${set}, ${title}, ${period}.`,
+    vectorScoreboard: (set: number, title: string, period: string) =>
+      `Flat illustration: a scoreboard card with a ring of stars — Set ${set}, ${title}, ${period}.`,
+    asciiScoreboard: (set: number, title: string, period: string) =>
+      `ASCII art: a terminal prints the scoreboard — Set ${set}, ${title}, ${period}.`,
+    sketchScoreboard: (set: number, title: string, period: string) =>
+      `Pencil sketch: a scoreboard drawn by hand — Set ${set}, ${title}, ${period}.`,
     announceFinale: 'Match point. Press Space, click or tap to spike.',
     finale: {
       kicker: 'Set 5 · Tie-break',
       title: 'Match point',
-      text: 'One ball left. The 3D court — where you time the spike yourself — is coming soon. For now, take the point.',
+      text: 'One ball left. Spike it — and the portfolio opens.',
       spike: 'Spike it',
     },
     art: {

@@ -1,6 +1,6 @@
 // npm run art:drafts
 // Paints Set 1's pixel-art drafts with the scene code and saves them as PNG files:
-// - public/art/set1/shotN/…    what the site loads (until Mert's own drawings replace them)
+// - public/art/set1/<shot>/…  what the site loads (until Mert's own drawings replace them)
 // - design/pixel-kit/drafts/…  copies to paint over in Aseprite or Photoshop
 // Vite loads the TypeScript scene modules in Node, so no browser is needed.
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -53,18 +53,24 @@ const server = await createServer({
 const load = (path) => server.ssrLoadModule(`/src/quest/chapters/highschool/${path}`)
 
 try {
-  const [istanbul, school, firstMatch, aydin] = await Promise.all([
-    load('istanbul.ts'),
-    load('school.ts'),
-    load('firstmatch.ts'),
-    load('aydin.ts'),
+  const [arena, scoreboard, room, bus, classroom, yard, court] = await Promise.all([
+    load('arena.ts'),
+    load('scoreboard.ts'),
+    load('room.ts'),
+    load('bus.ts'),
+    load('class.ts'),
+    load('yard.ts'),
+    load('court.ts'),
   ])
+  // [file, picture, also a draft to paint over?] — one folder per shot (public/art/set1/…)
   const files = [
-    ['shot1/background.png', istanbul.paintIstanbulBackground(), true],
-    ['shot2/background.png', school.paintSchoolBackground(), true],
-    ['shot2/kid.png', school.paintKidSheet(), false],
-    ['shot3/background.png', firstMatch.paintFirstMatchBackground(), true],
-    ['shot4/background.png', aydin.paintAydinBackground(), true],
+    ['arena/background.png', arena.paintArenaBackground(), true],
+    ['scoreboard/background.png', scoreboard.paintScoreboardBackground(), true],
+    ['room/background.png', room.paintRoomBackground(), true],
+    ['bus/background.png', bus.paintBusBackground(), true],
+    ['class/background.png', classroom.paintClassBackground(), true],
+    ['yard/background.png', yard.paintYardBackground(), true],
+    ['court/background.png', court.paintCourtBackground(), true],
   ]
   mkdirSync('design/pixel-kit/drafts', { recursive: true })
   for (const [name, buffer, draft] of files) {

@@ -1,5 +1,13 @@
 import { AnimatePresence, m, useReducedMotion, type Variants } from 'motion/react'
-import { useCallback, useEffect, useRef, type MouseEvent, type SyntheticEvent } from 'react'
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  type MouseEvent,
+  type SyntheticEvent,
+} from 'react'
 
 import type { ExperienceState } from '@/app/experienceMachine'
 import { useExperience } from '@/app/experienceStore'
@@ -13,17 +21,26 @@ import { questChapters } from './chapters'
 import { ControlsBar } from './ControlsBar'
 import { ScoreboardHUD } from './ScoreboardHUD'
 import { SetScene } from './SetScene'
+import { stepDuration, stepOf, stepsIn } from './steps'
 import { TransitionView } from './TransitionView'
+import { useAutoplay } from './useAutoplay'
 import { useQuestInput } from './useQuestInput'
 import { useSwipe } from './useSwipe'
+
+// The finale in 3D (with three.js): its own file, loaded near the end of the quest. Until it is
+// there — or if it can't load — the simple finale stands in.
+const loadFinale = () => import('../chapters/now/Finale3D')
+const Finale3D = lazy(loadFinale)
 
 // What a screen reader announces at each step
 function announcement(state: ExperienceState, chapters: Chapter[], t: Messages) {
   if (state.name === 'FINALE') return t.quest.announceFinale
   if (state.name !== 'QUEST') return ''
   const chapter = chapters[state.chapter]
-  const line = chapter.beats[state.beat]
-  return state.beat === 0 ? t.quest.announceSet(chapter.set, chapter.title, line) : line
+  const step = stepOf(chapter, state.beat)
+  return step.kind === 'scoreboard'
+    ? t.quest.announceSet(chapter.set, chapter.title, chapter.period)
+    : step.scene.caption
 }
 
 // Moving between sets: the new set slides in from the side you are heading to, the old one
@@ -50,8 +67,6 @@ export function QuestStage() {
   const slide = useReducedMotion() ? 0 : direction
   const dialogRef = useRef<HTMLDialogElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
-
-  useQuestInput()
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -81,6 +96,22 @@ export function QuestStage() {
   const spike = () => send({ type: 'SPIKE' })
   const transitionDone = useCallback(() => send({ type: 'TRANSITION_DONE' }), [send])
 
+  const current = state.name === 'QUEST' ? questChapters[state.chapter] : undefined
+  const chapterIndex = state.name === 'QUEST' ? state.chapter : -1
+  const step = state.name === 'QUEST' ? state.beat : 0
+  const chapter = chapterIndex >= 0 ? chapters[chapterIndex] : undefined
+
+  // The quest plays by itself: every step stays for its time, then Next
+  const stepKey = `${chapterIndex}.${step}`
+  const duration = chapter ? stepDuration(stepOf(chapter, step), current?.scoreboardMs) : 0
+  const autoplay = useAutoplay({
+    stepKey,
+    duration,
+    active: state.name === 'QUEST',
+    onDone: () => send({ type: 'NEXT' }),
+  })
+  useQuestInput({ onTogglePlay: autoplay.toggle })
+
   const swipe = useSwipe((direction) => (direction === 'left' ? next() : prev()))
 
   // A click or tap anywhere on the scene moves on (in the finale: spikes)
@@ -97,15 +128,13 @@ export function QuestStage() {
     skip()
   }
 
-  const current = state.name === 'QUEST' ? questChapters[state.chapter] : undefined
-  const chapterIndex = state.name === 'QUEST' ? state.chapter : -1
-
   // Download this set's art and the next one's while the visitor reads, so a set never
   // arrives with an empty panel (calling the same import twice costs nothing)
   useEffect(() => {
     if (chapterIndex < 0) return
     questChapters[chapterIndex]?.preload()
     questChapters[chapterIndex + 1]?.preload()
+    if (chapterIndex === questChapters.length - 1) void loadFinale() // the finale is next
   }, [chapterIndex])
 
   return (
@@ -137,7 +166,7 @@ export function QuestStage() {
                   initial={false}: the first set doesn't slide in (the stage fades in instead). */}
               <AnimatePresence initial={false} custom={slide}>
                 <m.div
-                  key={current?.chapter.id ?? 'finale'}
+                  key={current?.id ?? 'finale'}
                   custom={slide}
                   variants={SLIDE}
                   initial="enter"
@@ -148,15 +177,18 @@ export function QuestStage() {
                   // the dark behind it in that same layer (or it shows as grey noise everywhere)
                   className="absolute inset-0 bg-night"
                 >
-                  {current ? (
+                  {current && chapter ? (
                     <SetScene
-                      chapter={chapters[chapterIndex]}
-                      beat={state.name === 'QUEST' ? state.beat : 0}
+                      chapter={chapter}
+                      step={step}
                       Art={current.Art}
                       layout={current.layout}
+                      ownScoreboard={current.ownScoreboard}
                     />
                   ) : (
-                    <FinalePlaceholder onSpike={spike} />
+                    <Suspense fallback={<FinalePlaceholder onSpike={spike} />}>
+                      <Finale3D onSpike={spike} />
+                    </Suspense>
                   )}
                 </m.div>
               </AnimatePresence>
@@ -164,8 +196,13 @@ export function QuestStage() {
 
             <ControlsBar
               finale={state.name === 'FINALE'}
-              beat={state.name === 'QUEST' ? state.beat : 0}
-              beats={current?.chapter.beats.length ?? 0}
+              step={step}
+              steps={chapter ? stepsIn(chapter) : 0}
+              stepKey={stepKey}
+              duration={duration}
+              playing={autoplay.playing}
+              running={autoplay.running}
+              onTogglePlay={autoplay.toggle}
               onPrev={prev}
               onNext={next}
             />

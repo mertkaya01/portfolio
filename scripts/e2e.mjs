@@ -50,6 +50,10 @@ const quest = (page) =>
       open: !!d?.open,
       hud: d?.querySelector('header p')?.textContent ?? '',
       transition: !!d?.querySelector('[data-transition]'),
+      said: d?.querySelector('[aria-live]')?.textContent ?? '', // what a screen reader hears
+      art: d?.querySelector('[role="img"]')?.getAttribute('aria-label') ?? '',
+      caption: d?.querySelector('figure + div p:last-of-type')?.textContent ?? '',
+      play: d?.querySelector('footer button[aria-label]')?.getAttribute('aria-label') ?? '',
     }
   })
 
@@ -165,6 +169,32 @@ try {
   await sleep(400)
   let q = await quest(page)
   check('Enter starts the quest at set 1', q.open && q.hud.includes('Set 1'), q.hud)
+  check(
+    'set 1 opens with its scoreboard',
+    q.said === 'Set 1, High School, 07.2017 – 07.2021.' && /scoreboard/i.test(q.art),
+    `${q.said} · ${q.art}`,
+  )
+  await page.keyboard.press('ArrowRight')
+  await sleep(300)
+  q = await quest(page)
+  check('then the first scene, with its caption', /alarm/i.test(q.caption), q.caption)
+  await page.keyboard.press('Space')
+  await sleep(300)
+  check('Space does not move on outside the finale', (await quest(page)).said === q.said)
+  // plays by itself: the next scene comes within its time (≤ 7 s)
+  const playedFrom = q.said
+  for (let i = 0; i < 75 && (await quest(page)).said === playedFrom; i++) await sleep(100)
+  q = await quest(page)
+  check('plays by itself', q.said !== playedFrom && /bus/i.test(q.said), q.said)
+  // P pauses: nothing moves for longer than any step lasts
+  await page.keyboard.press('p')
+  await sleep(7500)
+  check(
+    'P pauses it',
+    (await quest(page)).said === q.said && (await quest(page)).play === 'Play',
+    (await quest(page)).play,
+  )
+  await page.keyboard.press('p')
   const sets = new Set()
   for (let i = 0; i < 40 && !q.hud.toLowerCase().includes('match point'); i++) {
     sets.add(q.hud)
@@ -207,6 +237,22 @@ try {
   check('phone: Start opens the quest', q.open)
   check('no console errors (phone)', phone.problems.length === 0, phone.problems.join(' | '))
   await phone.close()
+
+  // less motion: the quest waits for the visitor instead of playing by itself
+  const calm = await open(DEV)
+  await calm.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
+  await calm.reload({ waitUntil: 'networkidle0' })
+  await sleep(400)
+  await calm.keyboard.press('Enter')
+  await sleep(4500)
+  q = await quest(calm)
+  check(
+    'reduced motion: starts paused, stays on the scoreboard',
+    q.play === 'Play' && q.said.startsWith('Set 1,'),
+    `${q.play} · ${q.said}`,
+  )
+  check('no console errors (reduced motion)', calm.problems.length === 0, calm.problems.join(' | '))
+  await calm.close()
 
   // Turkish: the switch in the nav, everything translated, remembered after a reload
   const trPage = await open(DEV)
@@ -272,11 +318,16 @@ try {
   await sleep(300)
   await trPage.keyboard.press('Enter')
   await sleep(400)
+  q = await quest(trPage)
   check(
     'TR: the quest in Turkish',
-    (await quest(trPage)).hud.includes('Lise'),
-    (await quest(trPage)).hud,
+    q.hud.includes('Lise') && q.said === 'Set 1, Lise, 07.2017 – 07.2021.' && q.play === 'Duraklat',
+    `${q.hud} · ${q.said} · ${q.play}`,
   )
+  await trPage.keyboard.press('ArrowRight')
+  await sleep(300)
+  q = await quest(trPage)
+  check('TR: captions in Turkish', q.caption.startsWith('Lisede sıradan bir gün'), q.caption)
   await trPage.keyboard.press('Escape')
   await sleep(1600)
   check('no console errors (Turkish)', trPage.problems.length === 0, trPage.problems.join(' | '))

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 import { QUEST_ENABLED } from '@/config/features'
 import { chapters } from '@/data/en/quest'
+import { stepsIn } from '@/quest/engine/steps'
 
 import {
   transition,
@@ -10,8 +11,9 @@ import {
   type QuestShape,
 } from './experienceMachine'
 
-// What the rules need to know about the content: the number of beats in each chapter
-export const QUEST_SHAPE: QuestShape = chapters.map((c) => c.beats.length)
+// What the rules need to know about the content: the number of steps in each set
+// (its scoreboard + its scenes — see quest/engine/steps.ts)
+export const QUEST_SHAPE: QuestShape = chapters.map(stepsIn)
 
 const SEEN_KEY = 'beyond-the-court:quest-seen'
 

@@ -12,6 +12,7 @@ import * as tr from '../src/data/tr/content.ts'
 import { EDUCATION_TEXT } from '../src/data/tr/education.ts'
 import { EXPERIENCE_TEXT } from '../src/data/tr/experience.ts'
 import { PROJECT_TEXT } from '../src/data/tr/projects.ts'
+import { QUEST_TEXT } from '../src/data/tr/quest.ts'
 import { SKILL_TEXT } from '../src/data/tr/skills.ts'
 import { isTodo } from '../src/lib/todo.ts'
 
@@ -167,9 +168,18 @@ for (const group of skillGroups) {
     }
   }
 }
-chapters.forEach((chapter, i) => {
-  sameLength(chapter.beats, tr.chapters[i]?.beats, `set ${chapter.set} lines`)
-})
+for (const chapter of chapters) {
+  const ids = chapter.scenes.map((s) => s.id)
+  if (ids.length === 0) errors.push(`Set ${chapter.set} has no scenes`)
+  if (new Set(ids).size !== ids.length) errors.push(`Set ${chapter.set}: two scenes share an id`)
+  const text = QUEST_TEXT[chapter.id]
+  for (const id of ids) {
+    if (!text?.captions[id]) errors.push(`TR set ${chapter.set}: scene "${id}" has no caption`)
+  }
+  for (const id of Object.keys(text?.captions ?? {})) {
+    if (!ids.includes(id)) errors.push(`TR set ${chapter.set}: caption for unknown scene "${id}"`)
+  }
+}
 
 // ---------- Report ----------
 const featured = projects.filter((p) => p.featured).length

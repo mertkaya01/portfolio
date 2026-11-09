@@ -5,44 +5,58 @@ import type { Chapter } from '@/types/content'
 import { Grain } from '../scene-kit/Grain'
 import { LightCone } from '../scene-kit/LightCone'
 
+import { SetScoreboard } from './SetScoreboard'
+import { stepOf } from './steps'
 import type { ArtProps, SetLayout } from './types'
 
 type Props = {
-  chapter: Chapter
-  beat: number // the line being shown (0-based)
+  chapter: Chapter // the set's text in the current language
+  step: number // 0 = the scoreboard, then one step per scene
   Art: ComponentType<ArtProps> // this set's art (see chapters.ts)
-  layout?: SetLayout
+  layout: SetLayout
+  ownScoreboard: boolean // the art draws the scoreboard itself
 }
 
-// One set on the stage. Every set shares the same story text; how its art is shown depends on
-// the set (chapters.ts):
+// One set on the stage. A set opens with its scoreboard, then plays its scenes.
+// How the art is shown depends on the set (chapters.ts):
 //
-//   'panel' (default)                         'fullscreen' (e.g. Set 1's pixel art)
-//   desktop:  [ story ]  [   art panel   ]      desktop:  [ story │      the art, edge to edge ]
+//   'panel' (default)                         'fullscreen' (Set 1's pixel art)
+//   desktop:  [ story ]  [   art panel   ]      desktop:  [ the art, as big as it fits   ]
+//                                                         [          caption             ]
 //   phone:    [   art panel   ]                 phone:    [ the art, cropped to its middle ]
-//             [ story — this line ]                       [ story — this line ]
-export function SetScene({ chapter, beat, Art, layout = 'panel' }: Props) {
+//             [ story — this line ]                       [ caption ]
+export function SetScene({ chapter, step, Art, layout, ownScoreboard }: Props) {
+  const current = stepOf(chapter, step)
+  const scene = current.kind === 'scene' ? current.index : -1
+
+  if (current.kind === 'scoreboard' && !ownScoreboard) return <SetScoreboard chapter={chapter} />
+
   const art = (
     // Suspense: while the art's file is still downloading, the frame stays empty
     <Suspense fallback={null}>
-      <Art beat={beat} beats={chapter.beats.length} />
+      <Art chapter={chapter} scene={scene} />
     </Suspense>
   )
 
   if (layout === 'fullscreen') {
     return (
-      <div className="relative grid h-full w-full grid-rows-[minmax(0,45%)_minmax(0,1fr)] lg:block">
-        <figure className="relative m-0 min-h-0 overflow-hidden bg-night lg:absolute lg:inset-0">
+      // The figure stays the same element from the scoreboard to the last scene, so the art
+      // keeps running (and can dissolve from one picture into the next). The caption has its
+      // own row under the picture, kept even when empty, so the picture never jumps.
+      //   phone:   the picture's height is known (2× of 180 px), so picture + caption sit
+      //            together in the middle of the screen
+      //   larger:  the picture takes the room that is left and fits itself into it
+      // The art tells this frame how wide the picture is (--art-w), so the caption lines up
+      // with the picture's left edge, like a subtitle card under it.
+      <div data-art-frame className="relative flex h-full w-full flex-col justify-center">
+        <h2 className="sr-only">{chapter.title}</h2>
+        <figure className="relative m-0 h-[22.5rem] shrink-0 overflow-hidden bg-night sm:h-auto sm:min-h-0 sm:flex-1">
           {art}
         </figure>
-        {/* desktop: the left of the picture darkens a little, so the text reads on top of it */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-0 hidden w-[55%] bg-linear-to-r from-night/85 via-night/45 to-transparent lg:block"
-        />
-        {/* about a third of the width: the part of the picture that is kept calm for the text */}
-        <div className="relative flex min-h-0 flex-col justify-center px-4 py-6 sm:px-6 lg:h-full lg:w-[34%] lg:py-10">
-          <Story chapter={chapter} beat={beat} />
+        <div className="flex min-h-[6rem] justify-center px-4 pt-4 pb-2 sm:px-6">
+          <div className="w-full max-w-(--art-w)">
+            {current.kind === 'scene' && <Caption chapter={chapter} index={current.index} />}
+          </div>
         </div>
       </div>
     )
@@ -60,7 +74,7 @@ export function SetScene({ chapter, beat, Art, layout = 'panel' }: Props) {
       <Grain />
 
       <div className="relative order-2 flex min-h-0 flex-col justify-center lg:order-1">
-        <Story chapter={chapter} beat={beat} />
+        <Story chapter={chapter} index={scene} />
       </div>
 
       <figure className="relative order-1 m-0 min-h-0 overflow-hidden rounded-2xl border border-light/10 bg-black/40 lg:order-2 lg:h-[min(100%,36rem)]">
@@ -70,8 +84,25 @@ export function SetScene({ chapter, beat, Art, layout = 'panel' }: Props) {
   )
 }
 
-// The story: period, title and the lines so far — on a phone only the current line
-function Story({ chapter, beat }: { chapter: Chapter; beat: number }) {
+// One short line under a full-screen picture, like a subtitle.
+// (Screen readers hear it from the stage's announcement, not from here.)
+function Caption({ chapter, index }: { chapter: Chapter; index: number }) {
+  const scene = chapter.scenes[index]
+  return (
+    // key: a new scene's caption rises in; a yellow edge ties it to the picture above
+    <div key={scene.id} className="animate-rise border-l-2 border-accent pl-4">
+      <p aria-hidden="true" className="font-mono text-[0.65rem] tracking-[0.3em] text-wood">
+        {index + 1} / {chapter.scenes.length}
+      </p>
+      <p className="mt-1.5 max-w-3xl text-base leading-relaxed text-light sm:text-lg">
+        {scene.caption}
+      </p>
+    </div>
+  )
+}
+
+// The story next to a panel: period, title and the lines so far — on a phone only the current one
+function Story({ chapter, index }: { chapter: Chapter; index: number }) {
   return (
     <>
       <p className="font-mono text-xs tracking-[0.3em] text-wood uppercase">{chapter.period}</p>
@@ -80,14 +111,14 @@ function Story({ chapter, beat }: { chapter: Chapter; beat: number }) {
       </h2>
       {/* (Screen readers hear each new line from the stage's announcement, not from here) */}
       <ol className="mt-6 space-y-4 lg:mt-10">
-        {chapter.beats.slice(0, beat + 1).map((line, i) => (
+        {chapter.scenes.slice(0, index + 1).map((scene, i) => (
           <li
-            key={line}
+            key={scene.id}
             className={`max-w-xl text-lg leading-relaxed transition-colors duration-500 sm:text-xl ${
-              i === beat ? 'animate-rise text-light' : 'hidden text-light/35 lg:block'
+              i === index ? 'animate-rise text-light' : 'hidden text-light/35 lg:block'
             }`}
           >
-            {line}
+            {scene.caption}
           </li>
         ))}
       </ol>
