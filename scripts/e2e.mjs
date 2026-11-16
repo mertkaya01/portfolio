@@ -1,7 +1,7 @@
 // npm run test:e2e
 // Browser checks of the real site, in a headless Chrome or Edge already on this computer.
 //   1. dev server (quest switched on): portfolio, links, the quest from start to finish, phone
-//   2. production build (quest switched off, like the live site): no quest, one door
+//   2. production build (like the live site): the quest is there, Skip, deep links
 // Set E2E_BROWSER to a browser .exe if neither default path exists.
 import { existsSync } from 'node:fs'
 
@@ -382,7 +382,7 @@ try {
   await dev.close()
 }
 
-// ---------- 2. production build: quest off, like the live site ----------
+// ---------- 2. production build: like the live site ----------
 // (the dev server above set NODE_ENV=development for this process; a build would inherit it)
 process.env.NODE_ENV = 'production'
 await build({ logLevel: 'error', build: { outDir: 'node_modules/.e2e-dist', emptyOutDir: true } })
@@ -398,21 +398,20 @@ try {
     start: [...document.querySelectorAll('#top button')].some((b) =>
       b.textContent.includes('Start'),
     ),
-    enter: document.querySelector('#top a')?.textContent ?? '',
+    skip: document.querySelector('#top a')?.textContent ?? '',
     replay: [...document.querySelectorAll('footer button')].some((b) =>
       b.textContent.includes('Replay'),
     ),
   }))
-  check('live build: no Start button, no replay', !doors.start && !doors.replay)
-  check(
-    'live build: one door "Enter the portfolio"',
-    doors.enter.includes('Enter the portfolio'),
-    doors.enter,
-  )
+  check('live build: the quest is on (Start, Replay)', doors.start && doors.replay)
+  check('live build: a Skip door to the portfolio', doors.skip.includes('Skip'), doors.skip)
   await page.keyboard.press('Enter')
-  await sleep(1500)
+  await sleep(800)
+  check('live build: Enter starts the quest', (await quest(page)).open)
+  await page.keyboard.press('Escape')
+  await sleep(1600)
   check(
-    'live build: Enter goes to the portfolio',
+    'live build: Esc skips to the portfolio',
     !(await quest(page)).open && (await top(page, 'about')) < 200,
   )
   const deep = await open(PROD, '/projects/marketplace')
