@@ -9,7 +9,8 @@ import { LOCALES, useContent, useLocale, useT } from '@/i18n'
 // Same order as the sections on the page (PortfolioPage.tsx).
 const LINKS = ['education', 'experience', 'projects', 'skills', 'interest', 'contact'] as const
 
-// Sticky top bar. On small screens the links fold into a menu button.
+// Sticky top bar. Below 1024 px (phones and tablets) the links fold into a menu button — six
+// links, the language switch and the CV button only fit side by side from there.
 export function Nav() {
   const [open, setOpen] = useState(false)
   const t = useT()
@@ -38,7 +39,7 @@ export function Nav() {
           <span className="sr-only">{t.nav.brand(profile.name)}</span>
         </Link>
 
-        <ul className="hidden items-center gap-6 md:flex">
+        <ul className="hidden items-center gap-6 lg:flex">
           {LINKS.map((hash) => (
             <li key={hash}>
               <Link
@@ -53,7 +54,7 @@ export function Nav() {
         </ul>
 
         <div className="flex items-center gap-3">
-          <LanguageSwitch className="hidden md:flex" />
+          <LanguageSwitch className="hidden lg:flex" />
           <ButtonLink href={profile.links.cv} download="Mert-Kaya-CV.pdf" variant="accent">
             {t.nav.cv}
           </ButtonLink>
@@ -62,7 +63,7 @@ export function Nav() {
             onClick={() => setOpen((o) => !o)}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className="flex size-10 items-center justify-center rounded-full border border-light/20 md:hidden"
+            className="flex size-10 items-center justify-center rounded-full border border-light/20 lg:hidden"
           >
             <span className="sr-only">{open ? t.nav.closeMenu : t.nav.openMenu}</span>
             <MenuIcon open={open} />
@@ -71,7 +72,7 @@ export function Nav() {
       </nav>
 
       {open && (
-        <div id="mobile-menu" className="border-t border-light/10 md:hidden">
+        <div id="mobile-menu" className="border-t border-light/10 lg:hidden">
           <ul className="mx-auto max-w-6xl space-y-1 px-4 py-4">
             {LINKS.map((hash) => (
               <li key={hash}>

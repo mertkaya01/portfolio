@@ -41,6 +41,11 @@ export function HeroSection() {
               </li>
             ))}
           </ul>
+          {/* when and where: the first two questions a recruiter has */}
+          <p className="mt-4 flex items-center gap-2.5 text-sm text-light/70">
+            <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-go" />
+            {profile.availability} · {profile.workModes}
+          </p>
 
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <ButtonLink href="#projects" variant="accent">

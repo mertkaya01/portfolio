@@ -9,7 +9,8 @@ export const profile: Profile = {
   photo: { ...en.photo, alt: 'Mert Kaya’nın portresi' },
   summary:
     'İstanbul Kültür Üniversitesi Bilgisayar Mühendisliği mezunuyum. Spring Boot ve Angular ile uçtan uca sistemler, Python, OpenCV ve LLM’lerle uygulamalı yapay zekâ araçları geliştiriyorum. Dokuz yıllık rekabetçi voleybol bana iyi bir takımın nasıl çalıştığını öğretti — şimdi yeni takımımı arıyorum.',
-  availability: 'Yeni fırsatlara açığım',
+  availability: 'Hemen başlayabilirim',
+  workModes: 'İstanbul · ofis, hibrit ya da remote · taşınmaya açık',
   lookingFor: [
     'Junior Backend Mühendisi',
     'Junior Full-stack Mühendisi',

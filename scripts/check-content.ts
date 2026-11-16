@@ -4,7 +4,7 @@
 //   ! warnings → worth fixing before release (e.g. a featured project without screenshots)
 //   ☐ TODOs    → text that still needs your input ("TODO: …" anywhere in the data)
 // Node 24 runs TypeScript files directly by stripping the types, so no build step is needed.
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import * as en from '../src/data/en/content.ts'
@@ -14,6 +14,7 @@ import { EXPERIENCE_TEXT } from '../src/data/tr/experience.ts'
 import { PROJECT_TEXT } from '../src/data/tr/projects.ts'
 import { QUEST_TEXT } from '../src/data/tr/quest.ts'
 import { SKILL_TEXT } from '../src/data/tr/skills.ts'
+import { SITE_URL } from '../src/config/site.ts'
 import { isTodo } from '../src/lib/todo.ts'
 
 const errors: string[] = []
@@ -178,6 +179,27 @@ for (const chapter of chapters) {
   }
   for (const id of Object.keys(text?.captions ?? {})) {
     if (!ids.includes(id)) errors.push(`TR set ${chapter.set}: caption for unknown scene "${id}"`)
+  }
+}
+
+// ---------- The host: every project page has its rewrite, the link preview its address ----------
+// render.yaml rewrites only the real pages to the app (anything else gets a real 404), so a new
+// project needs its line there too.
+const render = readFileSync('render.yaml', 'utf8')
+const rewritten = [...render.matchAll(/source: \/projects\/([a-z0-9-]+)/g)].map((m) => m[1])
+for (const slug of slugs) {
+  if (!rewritten.includes(slug)) {
+    errors.push(`render.yaml has no rewrite for /projects/${slug} — the page would be a 404 live`)
+  }
+}
+for (const slug of rewritten) {
+  if (!slugs.has(slug)) errors.push(`render.yaml rewrites /projects/${slug}, which is no project`)
+}
+const page = readFileSync('index.html', 'utf8')
+for (const tag of ['og:url', 'og:image']) {
+  const value = page.match(new RegExp(`property="${tag}" content="([^"]+)"`))?.[1]
+  if (!value?.startsWith(SITE_URL)) {
+    errors.push(`index.html ${tag} should start with ${SITE_URL} (src/config/site.ts)`)
   }
 }
 

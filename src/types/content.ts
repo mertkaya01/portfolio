@@ -14,7 +14,8 @@ export type Profile = {
   location: string
   photo: { src: string; alt: string } // shown on the player card
   summary: string // 2–3 sentences for the hero / about section
-  availability: string // status line on the player card
+  availability: string // status line on the player card: when he can start
+  workModes: string // where and how he can work (hero and contact)
   lookingFor: string[] // roles he is applying for
   email: string
   links: { github: string; linkedin: string; cv: string }

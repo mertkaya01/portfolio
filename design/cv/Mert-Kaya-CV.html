@@ -1,0 +1,284 @@
+<!doctype html>
+<!--
+  Mert Kaya's CV — the source. Edit the text here, then run `npm run cv`: it prints this page
+  to public/cv/Mert-Kaya-CV.pdf (the file the site's "CV" buttons download), A4.
+  Keep it in step with the site: the skills follow the levels in src/data/en/skills.ts and the
+  projects are the four featured ones in src/data/en/projects.ts.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mert Kaya — CV</title>
+    <style>
+      @page {
+        size: A4;
+        margin: 13mm 14mm 12mm;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Calibri, Carlito, 'Segoe UI', Arial, sans-serif;
+        font-size: 10pt;
+        line-height: 1.27;
+        color: #111;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      header {
+        text-align: center;
+      }
+      h1 {
+        font-size: 20pt;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .contact {
+        margin-top: 3pt;
+      }
+      .contact span + span::before,
+      .status span + span::before {
+        content: ' • ';
+      }
+      .status {
+        margin-top: 1pt;
+        font-weight: 600;
+      }
+      h2 {
+        margin: 7pt 0 3pt;
+        padding-bottom: 1.5pt;
+        border-bottom: 0.8pt solid #111;
+        font-size: 11.5pt;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .entry {
+        margin-top: 3pt;
+        break-inside: avoid;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12pt;
+      }
+      .row > :last-child {
+        text-align: right;
+        white-space: nowrap;
+      }
+      .org {
+        font-weight: 700;
+      }
+      .role {
+        font-style: italic;
+      }
+      ul {
+        margin: 1.5pt 0 0 13pt;
+      }
+      li {
+        margin-top: 1pt;
+      }
+      .skills p {
+        margin-top: 1.5pt;
+      }
+      b {
+        font-weight: 700;
+      }
+      .muted {
+        color: #444;
+      }
+      /* the repo links in Projects: clickable in the PDF, so they look like links */
+      li a[href^='https://github.com/mertkaya01/'] {
+        text-decoration: underline;
+        text-underline-offset: 1.5pt;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Mert Kaya</h1>
+      <p class="contact">
+        <span>Istanbul</span>
+        <span
+          ><a href="https://www.linkedin.com/in/kayamert17/">linkedin.com/in/kayamert17</a></span
+        >
+        <span><a href="https://github.com/mertkaya01">github.com/mertkaya01</a></span>
+        <span><a href="tel:+905079066639">+90 507 906 6639</a></span>
+        <span><a href="mailto:kaya.mert01@yandex.com">kaya.mert01@yandex.com</a></span>
+      </p>
+      <p class="status">
+        <span
+          >Portfolio:
+          <a href="https://portfolio-nkxn.onrender.com">portfolio-nkxn.onrender.com</a></span
+        >
+        <span>Available immediately</span>
+        <span>Office, hybrid or remote</span>
+        <span>Open to relocation</span>
+      </p>
+    </header>
+
+    <h2>Education</h2>
+    <div class="entry">
+      <div class="row">
+        <span class="org">Istanbul Kültür University</span><span>Istanbul · 2022 – 2026</span>
+      </div>
+      <p class="role">Computer Engineering, Bachelor's Degree</p>
+      <p>
+        Relevant coursework: Data Structures and Algorithms, Object-Oriented Programming, Operating
+        Systems, Software Engineering, Embedded Systems and Arduino Applications.
+      </p>
+    </div>
+    <div class="entry">
+      <div class="row">
+        <span class="org">Technische Hochschule Brandenburg — Erasmus Exchange</span
+        ><span>Brandenburg an der Havel, Germany · 03.2025 – 08.2025</span>
+      </div>
+      <p class="role">Study abroad: Computer Science and Media</p>
+      <ul>
+        <li>
+          Completed Computer Science coursework and Master's-level business courses in an
+          international academic environment.
+        </li>
+        <li>
+          Worked on team projects with international students, strengthening collaboration and
+          technical communication.
+        </li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="row">
+        <span class="org">Fahreddin Kerim Gökay Anadolu Lisesi</span
+        ><span>Istanbul · 2017 – 2021</span>
+      </div>
+      <p class="role">Science track (Sayısal)</p>
+    </div>
+
+    <h2>Experience</h2>
+    <div class="entry">
+      <div class="row">
+        <span
+          ><span class="org">BTC Bilişim Hizmetleri A.Ş.</span> —
+          <span class="role">Intern</span></span
+        ><span>Istanbul · 07.2026 – 09.2026</span>
+      </div>
+      <ul>
+        <li>
+          Developed a full-stack hotel reservation service and an e-commerce marketplace using
+          Spring Boot, Angular, PostgreSQL and H2.
+        </li>
+        <li>Implemented high-performance search and filtering by integrating Apache Solr.</li>
+        <li>
+          Created AI-integrated WhatsApp automation bots for customer service and bookings using
+          Node.js, Puppeteer and LLM APIs.
+        </li>
+        <li>
+          Managed CI/CD pipelines, containerization and cloud deployments using Docker, GitHub
+          Actions, Vercel and Render.
+        </li>
+        <li>
+          Secured REST APIs with stateless JWT authentication, role-based access control (RBAC) and
+          BCrypt hashing.
+        </li>
+        <li>
+          Ensured reliability and code quality with unit and integration tests using JUnit 5,
+          Mockito and Vitest.
+        </li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="row">
+        <span
+          ><span class="org">Modakent Tekstil Firması</span> —
+          <span class="role">IT Staff</span></span
+        ><span>Istanbul · 08.2024 – 03.2025</span>
+      </div>
+      <ul>
+        <li>
+          Installed and configured the “Entegra” application on 20+ workstations, streamlining the
+          invoicing and sales workflow.
+        </li>
+        <li>
+          Managed product data entry and tracking via XML and Excel files for multiple sales
+          platforms (Trendyol, N11, own website).
+        </li>
+        <li>
+          Assisted with computer hardware setups and guided new software integrations for end users.
+        </li>
+      </ul>
+    </div>
+    <div class="entry">
+      <div class="row">
+        <span
+          ><span class="org">INKA Human Resources, ME Agency, BRN&amp;NU Agency</span> —
+          <span class="role">Part-time</span></span
+        ><span>Istanbul · 2021 – 2025</span>
+      </div>
+      <ul>
+        <li>
+          Coordinated and staffed events at Volkswagen Arena, Ülker Sports Arena, Sinan Erdem,
+          Atatürk Cultural Center, Haliç Congress Center and TÜYAP with INKA Human Resources.
+        </li>
+        <li>
+          At Yenikapı ISTFEST with ME Agency and BRN&amp;NU: ran an orienteering race for MR.DIY's
+          visitors — greeted groups, guided participants, handed out prizes to the winners and
+          strengthened one-on-one communication skills.
+        </li>
+      </ul>
+    </div>
+
+    <h2>Projects</h2>
+    <p class="muted">
+      Full case studies: portfolio-nkxn.onrender.com · code on GitHub (links below)
+    </p>
+    <ul>
+      <li>
+        <b>Hotel Commerce Service</b> — full-stack hotel search and booking platform on a real hotel
+        dataset (Spring Boot, Angular, Apache Solr); admin approval decides what the search index
+        shows; JWT and role-based access.
+        <a href="https://github.com/mertkaya01/Hotel-Commerce-Service">(code)</a>
+      </li>
+      <li>
+        <b>Hotel AI Concierge</b> — WhatsApp assistant that understands free-form requests and
+        searches the real hotel API through LLM tool calling, with an agent loop (Node.js).
+        <a href="https://github.com/mertkaya01/WhatsAppHotelSearchBot-AI">(code)</a>
+      </li>
+      <li>
+        <b>Exam Layout Verification Engine</b> — computer-vision engine (Python, OpenCV) that checks
+        scanned exam papers against their templates and reports its confidence; my part of a team
+        grading system.
+        <a href="https://github.com/mertkaya01/Exam-Validator-V1">(code)</a>
+      </li>
+      <li>
+        <b>Marketplace</b> — multi-vendor B2C marketplace for buyers, sellers and admins (Spring
+        Boot, Angular, PostgreSQL); refresh-token rotation with reuse detection, checkout in one
+        transaction.
+        <a href="https://github.com/mertkaya01/marketplace-website">(code)</a>
+      </li>
+    </ul>
+
+    <h2>Skills &amp; Interests</h2>
+    <div class="skills">
+      <p><b>Programming:</b> Java, TypeScript / JavaScript, Python, SQL — beginner: C / C++, R</p>
+      <p>
+        <b>Backend:</b> Spring Boot, Spring Security (JWT, RBAC), JPA / Hibernate, REST APIs,
+        Node.js
+      </p>
+      <p><b>Frontend:</b> Angular, HTML / CSS, React, Tailwind CSS</p>
+      <p>
+        <b>Data &amp; AI:</b> PostgreSQL, H2, SQLite, Apache Solr, OpenCV, LLM tool calling, Pandas
+      </p>
+      <p>
+        <b>DevOps &amp; Testing:</b> Git / GitHub, Docker, GitHub Actions, Vercel, Render, Linux,
+        JUnit 5, Mockito, Vitest
+      </p>
+      <p><b>Languages:</b> Turkish (native), English C1, German A2</p>
+      <p>
+        <b>Interests:</b> competitive volleyball for 9 years, orienteering, travel · B / A2 driving
+        licence
+      </p>
+    </div>
+  </body>
+</html>

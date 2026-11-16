@@ -7,7 +7,8 @@ export const profile: Profile = {
   photo: { src: '/images/profile/mert-kaya.jpg', alt: 'Portrait of Mert Kaya' },
   summary:
     'Computer Engineering graduate from Istanbul Kültür University. I build full-stack systems with Spring Boot and Angular, and applied-AI tools with Python, OpenCV and LLMs. Nine years of competitive volleyball taught me how good teams work — and I am looking for my next one.',
-  availability: 'Open to new opportunities',
+  availability: 'Available now',
+  workModes: 'Istanbul · office, hybrid or remote · open to relocation',
   lookingFor: [
     'Junior Backend Engineer',
     'Junior Full-stack Engineer',

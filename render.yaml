@@ -8,11 +8,44 @@ services:
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
     pullRequestPreviewsEnabled: false
-    # React Router pages (/projects/…): every path without a real file gets index.html.
-    # Render serves existing files (assets, CV, images) first and only rewrites the rest.
+    # The app's pages: "/" is index.html itself; each project page is rewritten to it here, one
+    # by one (npm run content:check makes sure every project is listed). Any other address
+    # matches no rule, so Render answers with dist/404.html and a real 404 status — the app's own
+    # "page not found" for visitors, a proper 404 for search engines. Real files (assets, the CV,
+    # images) are always served first.
     routes:
       - type: rewrite
-        source: /*
+        source: /projects/hotel-commerce-service
+        destination: /index.html
+      - type: rewrite
+        source: /projects/hotel-ai-concierge
+        destination: /index.html
+      - type: rewrite
+        source: /projects/exam-verification-engine
+        destination: /index.html
+      - type: rewrite
+        source: /projects/marketplace
+        destination: /index.html
+      - type: rewrite
+        source: /projects/uptime-monitor
+        destination: /index.html
+      - type: rewrite
+        source: /projects/hotel-whatsapp-bot
+        destination: /index.html
+      - type: rewrite
+        source: /projects/zenith-whatsapp-bot
+        destination: /index.html
+      - type: rewrite
+        source: /projects/weather-currency-bot
+        destination: /index.html
+      - type: rewrite
+        source: /projects/capstone-secure-network
+        destination: /index.html
+      - type: rewrite
+        source: /projects/linguatype
+        destination: /index.html
+      - type: rewrite
+        source: /projects/data-analysis-engine
         destination: /index.html
     headers:
       # Vite puts a content hash in every asset file name, so they can be cached forever

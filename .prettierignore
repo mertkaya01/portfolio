@@ -1,2 +1,5 @@
 package-lock.json
 dist
+# local research notes (not in git)
+research_notes
+reports

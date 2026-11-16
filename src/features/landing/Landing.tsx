@@ -167,6 +167,23 @@ export function Landing() {
             </kbd>
           </a>
         </div>
+
+        {/* For a recruiter in a hurry: the CV and the profiles, without going in first */}
+        <p className="mt-6 flex animate-rise items-center gap-5 font-mono text-[0.7rem] tracking-[0.2em] text-muted uppercase [animation-delay:3400ms]">
+          <a
+            href={profile.links.cv}
+            download="Mert-Kaya-CV.pdf"
+            className="transition-colors hover:text-accent"
+          >
+            {t.nav.cv}
+          </a>
+          <a href={profile.links.linkedin} className="transition-colors hover:text-accent">
+            LinkedIn
+          </a>
+          <a href={profile.links.github} className="transition-colors hover:text-accent">
+            GitHub
+          </a>
+        </p>
       </m.div>
     </section>
   )

@@ -15,10 +15,15 @@ export function ContactSection() {
         <p className="mt-2 max-w-3xl text-lg leading-relaxed text-light/80">
           {profile.lookingFor.join(' · ')}
         </p>
+        <p className="mt-2 flex items-center gap-2.5 text-light/70">
+          <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-go" />
+          {profile.availability} · {profile.workModes}
+        </p>
         <p className="mt-4 text-light/60">{t.contact.reach}</p>
         <a
           href={`mailto:${profile.email}`}
-          className="mt-8 inline-block font-display text-4xl font-black tracking-tight break-all transition-colors hover:text-accent sm:text-6xl"
+          // phones: small enough that the address fits on one line; it only breaks if it truly must
+          className="mt-8 inline-block font-display text-[clamp(1.5rem,8.5vw,1.875rem)] font-black tracking-tight [overflow-wrap:anywhere] transition-colors hover:text-accent sm:text-6xl"
         >
           {profile.email}
         </a>
