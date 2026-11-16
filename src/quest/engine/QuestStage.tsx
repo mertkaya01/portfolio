@@ -4,6 +4,7 @@ import {
   Suspense,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type MouseEvent,
@@ -60,7 +61,9 @@ export function QuestStage() {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
+  // Opened before the first paint: when the stage comes straight up in the transition (Skip on
+  // the landing), the page behind jumps in that same moment and must already be covered
+  useLayoutEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
     dialog.showModal()

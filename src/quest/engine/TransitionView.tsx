@@ -52,6 +52,10 @@ function targetBox(): Box {
   return { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight, radius: 0 }
 }
 
+// Straight to the player card, without the site's smooth scroll
+const jumpToPortfolio = () =>
+  document.getElementById('about')?.scrollIntoView({ behavior: 'instant', block: 'start' })
+
 const toStyle = (b: Box) => ({
   left: `${b.left}px`,
   top: `${b.top}px`,
@@ -74,9 +78,12 @@ export function TransitionView({ kind, onDone }: Props) {
   const fillRef = useRef<HTMLDivElement>(null)
   const linesRef = useRef<HTMLDivElement>(null)
 
-  // Put the frame in its start position before the first paint
+  // Before the first paint: put the frame in its start position, and — now that the dark covers
+  // the screen — jump the page behind to the portfolio, so the stage clears straight onto the
+  // player card. (Jumping any earlier would show the page moving before the animation.)
   useLayoutEffect(() => {
     if (frameRef.current) Object.assign(frameRef.current.style, toStyle(courtBox()))
+    jumpToPortfolio()
   }, [])
 
   useEffect(() => {
@@ -101,8 +108,8 @@ export function TransitionView({ kind, onDone }: Props) {
       fill: 'both',
     })
 
-    // Wait one frame: by then the page behind has jumped to the portfolio (HomePage does that),
-    // so the card is where it will stay
+    // Wait one frame: by then the page behind has settled at the portfolio (the scroll lock is
+    // off, the scrollbar is back), so the card is where it will stay
     const raf = requestAnimationFrame(() => {
       animations.push(
         frame.animate([toStyle(courtBox()), toStyle(targetBox())], at(DRAW, MOVE)),

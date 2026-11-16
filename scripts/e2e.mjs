@@ -414,6 +414,59 @@ try {
     'live build: Esc skips to the portfolio',
     !(await quest(page)).open && (await top(page, 'about')) < 200,
   )
+  // Skip on a first visit: the page may only move once the transition covers it (it used to
+  // jump down while the stage was still downloading, then animate down a second time)
+  const firstSkip = async (early) => {
+    const p = await browser.newPage()
+    await p.setViewport({ width: 1280, height: 900 })
+    await p.evaluateOnNewDocument(() => {
+      const tick = () => {
+        if (window.scrollY > 0 && window.__coveredWhenMoved === undefined) {
+          window.__coveredWhenMoved = !!document.querySelector(
+            'dialog[open], [data-transition-cover]',
+          )
+        }
+        requestAnimationFrame(tick)
+      }
+      requestAnimationFrame(tick)
+    })
+    if (early) {
+      // clicked at once, on a slow connection: before the stage has been preloaded
+      const cdp = await p.createCDPSession()
+      await cdp.send('Network.emulateNetworkConditions', {
+        offline: false,
+        latency: 300,
+        downloadThroughput: 190 * 1024,
+        uploadThroughput: 90 * 1024,
+      })
+      await p.goto(PROD + '/', { waitUntil: 'domcontentloaded' })
+      await p.waitForSelector('#top a[href="#about"]')
+    } else {
+      await p.goto(PROD + '/', { waitUntil: 'networkidle0' })
+      await sleep(800) // the stage is preloaded while the landing sits idle
+    }
+    await p.click('#top a[href="#about"]')
+    await p.waitForFunction(() => !document.querySelector('dialog') && window.scrollY > 0, {
+      timeout: 20000,
+    })
+    const result = {
+      covered: await p.evaluate(() => window.__coveredWhenMoved),
+      about: await top(p, 'about'),
+    }
+    await p.close()
+    return result
+  }
+  for (const early of [false, true]) {
+    const r = await firstSkip(early)
+    check(
+      `live build: first-visit Skip moves the page only under the transition (${
+        early ? 'clicked at once, slow network' : 'stage preloaded'
+      })`,
+      r.covered === true && Math.abs(r.about) < 200,
+      JSON.stringify(r),
+    )
+  }
+
   const deep = await open(PROD, '/projects/marketplace')
   check(
     'live build: deep link to a project works',
