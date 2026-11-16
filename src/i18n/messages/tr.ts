@@ -181,7 +181,7 @@ export const tr: Messages = {
     pause: 'Duraklat',
     play: 'Oynat',
     moveHint: '← → ya da kaydır',
-    spikeHint: 'Smaç için Space, tıkla ya da dokun',
+    spikeHint: 'Halka topa kapanınca smaç',
     spikeHintTouch: 'Smaç için dokun',
     announceSet: (set, title, period) => `Set ${set}, ${title}, ${period}.`,
     scoreboardArt: (set, title, period) =>
@@ -195,12 +195,43 @@ export const tr: Messages = {
       `ASCII: bir terminal skorbordu yazdırıyor — Set ${set}, ${title}, ${period}.`,
     sketchScoreboard: (set, title, period) =>
       `Karakalem: elle çizilmiş bir skorbord — Set ${set}, ${title}, ${period}.`,
-    announceFinale: 'Maç sayısı. Smaç için Space’e bas, tıkla ya da dokun.',
+    announceFinale:
+      'Maç sayısı. Pasör topu kaldırıyor: halka topa kapandığında Space’e bas — ok tuşlarıyla sola ya da sağa vur.',
     finale: {
       kicker: 'Set 5 · Tie-break',
       title: 'Maç sayısı',
       text: 'Son bir top kaldı. Smaçı vur — portfolyo açılsın.',
       spike: 'Smaçı vur',
+      hintKeys: 'Halka topa kapandığında Space · ← → ile yön',
+      hintTouch: 'Halka kapanınca dokun — açık tarafa',
+      words: {
+        kill: 'Sayı!',
+        blockout: 'Blok-aut!',
+        blocked: 'Blok!',
+        net: 'File!',
+        out: 'Aut!',
+        miss: 'Kaçtı!',
+      },
+      perfect: 'Mükemmel zamanlama',
+      point: 'Sayı — ve maç',
+      again: 'Bir top daha',
+      last: 'Son top — bu sefer Mert hallediyor',
+    },
+    graduationBanner: '2026 Mezunları',
+    journey: {
+      hint: 'Bavulu Brandenburg’a sürükle — ya da dokun',
+      travel: 'İstanbul’dan Brandenburg an der Havel’e yolculuk',
+      arrived: 'Brandenburg an der Havel’e varıldı',
+      stamp: 'Brandenburg an der Havel',
+    },
+    photos: {
+      bridge: 'Havel üzerindeki köprüde',
+      museum: 'Sanayi Müzesi’nde, Brandenburg an der Havel',
+      river: 'Havel’de gün batımı',
+      campus: 'Yurt penceremden kampüs',
+      open: (label) => `Fotoğraf: ${label}`,
+      close: 'Kapat',
+      missing: (id) => `Fotoğraf gelecek — src/quest/chapters/erasmus/photos/${id}.jpg olarak ekle`,
     },
     art: {
       label: 'Set görseli',

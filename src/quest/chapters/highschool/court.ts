@@ -236,5 +236,15 @@ export const courtShot: Shot = {
   background: COURT_BG,
   images: [MERT_SHEET],
   over: play,
+  // the hall's lights over the court: the court bright, the stands and walls in the dim;
+  // dust in the light above the floor
+  lighting: {
+    ambient: 0.8,
+    lights: [
+      { x: 160, y: 62, r: 125, power: 0.34 },
+      { x: 160, y: 128, r: 120, power: 0.3 },
+    ],
+    dust: { x: 100, y: 30, w: 120, h: 95, n: 16 },
+  },
   still: 0.7, // the ball against the block
 }

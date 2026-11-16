@@ -206,9 +206,31 @@ try {
     'all 5 sets played, match point reached',
     sets.size === 5 && q.hud.toLowerCase().includes('match point'),
   )
-  await page.keyboard.press('Space')
-  await sleep(250)
-  check('Space spikes → transition', (await quest(page)).transition)
+  // match point is a timing game now: keep swinging until the ball goes down. A miss brings
+  // another ball and after the second Mert takes it himself, so this always ends.
+  const finale = () =>
+    page.evaluate(() => {
+      const root = document.querySelector('[data-phase]')
+      return { phase: root?.dataset.phase ?? '', ring: !!root?.dataset.ring }
+    })
+  for (let i = 0; i < 60 && !(await finale()).phase; i++) await sleep(100)
+  check('match point is played in 3D', (await finale()).phase !== '')
+  await page.keyboard.press('Space') // before the ball is up: nothing happens
+  await sleep(300)
+  check('a swing before the ball is up does nothing', !(await quest(page)).transition)
+  let swung = 0
+  for (let i = 0; i < 120 && !(await quest(page)).transition; i++) {
+    if ((await finale()).ring) {
+      await page.keyboard.press('Space')
+      swung++
+    }
+    await sleep(250)
+  }
+  check(
+    'Space spikes until the point → transition',
+    (await quest(page)).transition,
+    `${swung} swings`,
+  )
   await sleep(1600)
   q = await quest(page)
   check('ends on the player card', !q.open && Math.abs((await top(page, 'about')) - 80) <= 3)
@@ -220,7 +242,29 @@ try {
       ?.click(),
   )
   await sleep(400)
-  await page.keyboard.press('ArrowRight')
+  // on the way: a photo by the Havel opens, and Esc closes the photo — not the quest
+  for (let i = 0; i < 40 && !/Six months/.test((await quest(page)).said); i++) {
+    await page.keyboard.press('ArrowRight')
+    await sleep(150)
+  }
+  await sleep(1800) // the spots pop in
+  const spot = await page.$('[aria-label^="Photo:"]')
+  await spot?.click()
+  await sleep(600)
+  const photoOpen = await page.evaluate(
+    () => !!document.querySelector('dialog[data-quest-photo]')?.open,
+  )
+  await page.keyboard.press('Escape')
+  await sleep(500)
+  const afterEsc = await page.evaluate(() => ({
+    photo: !!document.querySelector('dialog[data-quest-photo]'),
+    transition: !!document.querySelector('[data-transition]'),
+  }))
+  check(
+    'a Havel photo opens; Esc closes the photo, not the quest',
+    !!spot && photoOpen && !afterEsc.photo && !afterEsc.transition,
+    JSON.stringify({ spot: !!spot, photoOpen, ...afterEsc }),
+  )
   await page.keyboard.press('Escape')
   await sleep(1600)
   check('replay, then Esc skips to the portfolio', !(await quest(page)).open)

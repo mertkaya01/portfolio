@@ -2,110 +2,18 @@ import { useSceneTime } from '../../engine/useSceneTime'
 
 import { DISPLAY, FLAT, MERT_LOOK, MONO, pop, slideUp, grow, star } from './flat'
 import { Marker, SeatedBack, SeatedFront, Standing } from './people'
+import { Hotspots } from './hotspots'
+import { CAMPUS_PHOTOS, HAVEL_PHOTOS, type HavelPhoto } from './photos'
 import { Sky } from './scoreboard'
 
 // The scenes of Set 4, in flat vector. Everything that matters stays between x 70 and 249.
 
-// ---------- Istanbul → Brandenburg an der Havel: the flight ----------
-// A simple map: land in soft greens, the two cities with a landmark each (domes and minarets;
-// a brick church tower), a dashed route, the plane flying it.
-
-const FROM = { x: 222, y: 128 } // Istanbul
-const TO = { x: 104, y: 56 } // Brandenburg an der Havel
-const BOW = { x: 150, y: 58 } // the route bends up, like a flight path on a flat map
-const routeAt = (p: number) => ({
-  x: (1 - p) ** 2 * FROM.x + 2 * (1 - p) * p * BOW.x + p ** 2 * TO.x,
-  y: (1 - p) ** 2 * FROM.y + 2 * (1 - p) * p * BOW.y + p ** 2 * TO.y,
-})
-
-export function MoveScene() {
-  const t = useSceneTime(30)
-  const p = Math.min(1, Math.max(0, (t - 0.8) / 2.4))
-  const ease = p * p * (3 - 2 * p)
-  const plane = routeAt(ease)
-  const ahead = routeAt(Math.min(1, ease + 0.01))
-  const angle = (Math.atan2(ahead.y - plane.y, ahead.x - plane.x) * 180) / Math.PI
-  return (
-    <>
-      <rect width="320" height="180" fill="#bfe1f2" />
-      {/* land: a few soft shapes, not a real coastline */}
-      <path
-        d="M0 20 Q60 6 120 18 Q170 28 210 16 Q260 4 320 14 L320 96 Q280 108 250 100 Q220 92 196 104 Q170 116 140 108 Q100 98 70 112 Q36 128 0 116 Z"
-        fill="#cfe8c3"
-      />
-      <path
-        d="M180 120 Q210 110 240 118 Q270 126 320 116 L320 180 L170 180 Q160 150 180 120 Z"
-        fill="#cfe8c3"
-      />
-      <path d="M0 140 Q40 132 80 146 Q100 154 96 180 L0 180 Z" fill="#cfe8c3" />
-      {/* the route, drawing itself */}
-      <path
-        d={`M${FROM.x} ${FROM.y} Q${BOW.x} ${BOW.y} ${TO.x} ${TO.y}`}
-        fill="none"
-        stroke={FLAT.navy}
-        strokeWidth={1.1}
-        strokeDasharray="3 3"
-        opacity={0.7}
-      />
-      {/* Istanbul: domes and minarets */}
-      <g style={pop(200)}>
-        <circle cx={FROM.x} cy={FROM.y} r={3} fill={FLAT.brick} />
-        <path
-          d={`M${FROM.x - 12} ${FROM.y - 6} Q${FROM.x - 6} ${FROM.y - 20} ${FROM.x} ${FROM.y - 6} Z`}
-          fill={FLAT.navy}
-        />
-        <rect x={FROM.x - 16} y={FROM.y - 22} width={1.6} height={16} fill={FLAT.navy} />
-        <rect x={FROM.x + 2} y={FROM.y - 22} width={1.6} height={16} fill={FLAT.navy} />
-        <text
-          x={FROM.x + 8}
-          y={FROM.y + 12}
-          fontFamily={DISPLAY}
-          fontWeight={800}
-          fontSize={10}
-          fill={FLAT.navy}
-        >
-          İstanbul
-        </text>
-      </g>
-      {/* Brandenburg an der Havel: a brick church tower */}
-      <g style={pop(400)}>
-        <circle cx={TO.x} cy={TO.y} r={3} fill={FLAT.brick} />
-        <rect x={TO.x - 18} y={TO.y - 18} width={7} height={14} fill={FLAT.brick} />
-        <path
-          d={`M${TO.x - 19} ${TO.y - 18} L${TO.x - 14.5} ${TO.y - 28} L${TO.x - 10} ${TO.y - 18} Z`}
-          fill={FLAT.roof}
-        />
-        <text
-          x={TO.x - 4}
-          y={TO.y + 13}
-          fontFamily={DISPLAY}
-          fontWeight={800}
-          fontSize={10}
-          fill={FLAT.navy}
-        >
-          Brandenburg an der Havel
-        </text>
-      </g>
-      {/* the plane */}
-      <g transform={`translate(${plane.x} ${plane.y}) rotate(${angle})`}>
-        <path
-          d="M7 0 L-5 -1.6 L-7 -1 L-6 0 L-7 1 L-5 1.6 Z"
-          fill={FLAT.white}
-          stroke={FLAT.navy}
-          strokeWidth={0.5}
-        />
-        <path d="M1 -1 L-2 -6 L-3.5 -6 L-2 -1 Z M1 1 L-2 6 L-3.5 6 L-2 1 Z" fill={FLAT.euBlue} />
-      </g>
-    </>
-  )
-}
-
 // ---------- Six months by the Havel ----------
 // After Mert's photo on the bridge: a deep blue sky, the river, bare trees on the far bank, a
 // modern building on the right, the railing in front — and Mert in his white jacket, his long
-// dark hair tied back, looking down the river.
+// dark hair tied back, looking down the river. Over it, the spots that open his photos.
 
-export function HavelScene() {
+export function HavelScene({ onOpen }: { onOpen: (photo: HavelPhoto) => void }) {
   const t = useSceneTime(30)
   return (
     <>
@@ -153,6 +61,8 @@ export function HavelScene() {
           )),
         )}
       </g>
+      {/* haze: the far bank and the building, a little lost in the sky's colour */}
+      <rect y={30} width={320} height={72} fill={FLAT.sky} opacity={0.2} />
       {/* the river, its light moving */}
       <rect y={100} width={320} height={80} fill={FLAT.river} />
       {Array.from({ length: 14 }, (_, i) => {
@@ -188,6 +98,7 @@ export function HavelScene() {
           <rect key={i} x={i * 30 + 4} y={130} width={2.4} height={21} />
         ))}
       </g>
+      <Hotspots photos={HAVEL_PHOTOS} onOpen={onOpen} />
     </>
   )
 }
@@ -196,7 +107,7 @@ export function HavelScene() {
 // A lecture room in flat colours: on one screen code being written, on the other a business
 // chart growing. Three students in front, seen from behind; Mert has the yellow marker.
 
-export function CampusScene() {
+export function CampusScene({ onOpen }: { onOpen: (photo: HavelPhoto) => void }) {
   const t = useSceneTime(20)
   const code = ['class Team {', '  members = []', '  plan() {', '    return …', '  }', '}']
   const typedLines = Math.floor((t - 0.8) / 0.35)
@@ -265,6 +176,7 @@ export function CampusScene() {
         look={{ hair: FLAT.hair.black, style: 'short', skin: FLAT.skin[2], top: '#c46a3a' }}
       />
       <Marker x={160} y={118} />
+      <Hotspots photos={CAMPUS_PHOTOS} onOpen={onOpen} />
     </>
   )
 }

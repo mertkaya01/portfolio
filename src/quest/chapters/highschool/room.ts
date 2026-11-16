@@ -339,6 +339,13 @@ export const wakeShot: Shot = {
   background: ROOM_BG,
   images: [MERT_SHEET],
   over: wake,
+  // morning light from the window at the far end: the floor by the window glows, the door
+  // end of the room stays in the cool shade; dust drifts in the sun
+  lighting: {
+    ambient: 0.82,
+    lights: [{ x: 122, y: 18, r: 150, power: 0.42 }],
+    dust: { x: 105, y: 30, w: 70, h: 80, n: 14 },
+  },
   still: 2.4, // on his way to the door
 }
 

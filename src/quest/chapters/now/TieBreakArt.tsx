@@ -1,13 +1,14 @@
 import { Canvas } from '@react-three/fiber'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useT } from '@/i18n'
-import { useLocale } from '@/i18n/locale'
 
 import { setArtWidth } from '../../engine/artWidth'
 import type { ArtProps } from '../../engine/types'
 
 import { COLORS } from './colors'
+import { StageLights, Warmup } from './lights'
+import { setupStage } from './stage'
 import {
   CourtScene,
   GraduationScene,
@@ -29,9 +30,11 @@ function prefersCalm() {
 
 export default function TieBreakArt({ chapter, scene }: ArtProps) {
   const t = useT()
-  const locale = useLocale((s) => s.locale)
   const boxRef = useRef<HTMLDivElement>(null)
   const [calm] = useState(prefersCalm)
+  // nothing is drawn until the shaders are compiled (Warmup): no freeze as Set 5 comes on
+  const [ready, setReady] = useState(false)
+  const onReady = useCallback(() => setReady(true), [])
 
   // the 3D view fills its whole frame; the caption lines up with it
   useEffect(() => {
@@ -47,7 +50,8 @@ export default function TieBreakArt({ chapter, scene }: ArtProps) {
   const id = scene < 0 ? 'scoreboard' : (chapter.scenes[scene]?.id ?? 'court')
   const board = {
     set: String(chapter.set),
-    title: chapter.title.toLocaleUpperCase(locale === 'tr' ? 'tr-TR' : 'en-US'),
+    // "Tie-break" is the English word in both languages: TIE-BREAK, never the Turkish TİE-BREAK
+    title: chapter.title.toLocaleUpperCase('en-US'),
     period: chapter.period,
   }
   const label =
@@ -60,17 +64,17 @@ export default function TieBreakArt({ chapter, scene }: ArtProps) {
       <Canvas
         dpr={[1, 2]}
         camera={{ position: [0, 9, 20], fov: 45, near: 0.1, far: 100 }}
-        frameloop={calm ? 'demand' : 'always'}
+        frameloop={!ready ? 'never' : calm ? 'demand' : 'always'}
         gl={{ antialias: true }}
+        onCreated={setupStage}
       >
         <color attach="background" args={[COLORS.night]} />
         <fog attach="fog" args={[COLORS.night, 18, 42]} />
-        <ambientLight intensity={0.55} />
-        <directionalLight position={[6, 12, 8]} intensity={1.1} />
+        <StageLights />
         {id === 'scoreboard' ? (
           <ScoreboardScene key={id} board={board} calm={calm} />
         ) : id === 'graduated' ? (
-          <GraduationScene key={id} calm={calm} />
+          <GraduationScene key={id} calm={calm} banner={t.quest.graduationBanner} />
         ) : id === 'internship' ? (
           <InternshipScene key={id} calm={calm} />
         ) : id === 'looking' ? (
@@ -78,6 +82,7 @@ export default function TieBreakArt({ chapter, scene }: ArtProps) {
         ) : (
           <CourtScene key={id} calm={calm} />
         )}
+        <Warmup onReady={onReady} prepare={setupStage} />
       </Canvas>
     </div>
   )

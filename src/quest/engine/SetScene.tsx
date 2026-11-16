@@ -1,12 +1,15 @@
-import { Suspense, type ComponentType } from 'react'
+import { Suspense, useRef, type ComponentType } from 'react'
 
 import type { Chapter } from '@/types/content'
 
 import { Grain } from '../scene-kit/Grain'
 import { LightCone } from '../scene-kit/LightCone'
 
+import { ArtScreen } from './ArtScreen'
+import { useScreenSize } from './artWidth'
 import { SetScoreboard } from './SetScoreboard'
 import { stepOf } from './steps'
+import type { Arrival } from './transitions'
 import type { ArtProps, SetLayout } from './types'
 
 type Props = {
@@ -15,6 +18,7 @@ type Props = {
   Art: ComponentType<ArtProps> // this set's art (see chapters.ts)
   layout: SetLayout
   ownScoreboard: boolean // the art draws the scoreboard itself
+  arrival?: Arrival // how this set came on stage (transitions.ts)
 }
 
 // One set on the stage. A set opens with its scoreboard, then plays its scenes.
@@ -25,9 +29,11 @@ type Props = {
 //                                                         [          caption             ]
 //   phone:    [   art panel   ]                 phone:    [ the art, cropped to its middle ]
 //             [ story — this line ]                       [ caption ]
-export function SetScene({ chapter, step, Art, layout, ownScoreboard }: Props) {
+export function SetScene({ chapter, step, Art, layout, ownScoreboard, arrival }: Props) {
   const current = stepOf(chapter, step)
   const scene = current.kind === 'scene' ? current.index : -1
+  const figure = useRef<HTMLElement>(null)
+  const screen = useScreenSize(figure)
 
   if (current.kind === 'scoreboard' && !ownScoreboard) return <SetScoreboard chapter={chapter} />
 
@@ -46,12 +52,18 @@ export function SetScene({ chapter, step, Art, layout, ownScoreboard }: Props) {
       //   phone:   the picture's height is known (2× of 180 px), so picture + caption sit
       //            together in the middle of the screen
       //   larger:  the picture takes the room that is left and fits itself into it
-      // The art tells this frame how wide the picture is (--art-w), so the caption lines up
-      // with the picture's left edge, like a subtitle card under it.
+      // The picture sits on the quest's one screen (ArtScreen: the same size, frame, grain and
+      // edges for every set); its width (--art-w) lines the caption up with its left edge, like
+      // a subtitle card under it.
       <div data-art-frame className="relative flex h-full w-full flex-col justify-center">
         <h2 className="sr-only">{chapter.title}</h2>
-        <figure className="relative m-0 h-[22.5rem] shrink-0 overflow-hidden bg-night sm:h-auto sm:min-h-0 sm:flex-1">
-          {art}
+        <figure
+          ref={figure}
+          className="relative m-0 flex h-[22.5rem] shrink-0 items-center justify-center overflow-hidden sm:h-auto sm:min-h-0 sm:flex-1"
+        >
+          <ArtScreen size={screen} arrival={arrival}>
+            {art}
+          </ArtScreen>
         </figure>
         <div className="flex min-h-[6rem] justify-center px-4 pt-4 pb-2 sm:px-6">
           <div className="w-full max-w-(--art-w)">

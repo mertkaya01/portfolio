@@ -1,8 +1,19 @@
-import { useMemo, useRef } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { CanvasTexture, SRGBColorSpace, type MeshBasicMaterial } from 'three'
+import {
+  AdditiveBlending,
+  CanvasTexture,
+  Color,
+  DoubleSide,
+  Matrix4,
+  SRGBColorSpace,
+  type InstancedMesh,
+  type MeshBasicMaterial,
+} from 'three'
 
 import { COLORS } from './colors'
+import { SHAPES } from './figure'
+import { Glow } from './lights'
 
 // The 3D arena of Set 5, low-poly and simple: the orange court with its white lines and the
 // blue around it, the net, stands on both sides with a few people, lamps under the roof, and a
@@ -43,8 +54,25 @@ export function Arena() {
         <group key={x} position={[x, 11, 0]}>
           <mesh>
             <boxGeometry args={[1.6, 0.2, 1.6]} />
-            <meshBasicMaterial color="#fff6d8" />
+            <meshBasicMaterial color="#fff6d8" toneMapped={false} />
           </mesh>
+          {/* its glow, and a faint cone of light through the hall's haze — not from the middle
+              lamp, whose cone would hang a veil over the big screen below it */}
+          <Glow position={[0, -0.3, 0]} size={4.2} opacity={0.75} />
+          {x !== 0 && (
+            <mesh position={[0, -5.2, 0]} renderOrder={2}>
+              <coneGeometry args={[3.6, 10, 24, 1, true]} />
+              <meshBasicMaterial
+                color="#fff1cc"
+                transparent
+                opacity={0.035}
+                blending={AdditiveBlending}
+                depthWrite={false}
+                side={DoubleSide}
+                toneMapped={false}
+              />
+            </mesh>
+          )}
           <pointLight
             position={[0, -1, 0]}
             intensity={60}
@@ -87,7 +115,7 @@ function Net() {
   )
 }
 
-// Stepped stands along a side of the hall, with a scattering of people (simple blocks)
+// Stepped stands along a side of the hall, with a scattering of people
 function Stands({ side }: { side: -1 | 1 }) {
   const people = useMemo(() => {
     const list: { x: number; row: number; color: string }[] = []
@@ -113,13 +141,51 @@ function Stands({ side }: { side: -1 | 1 }) {
           <meshStandardMaterial color={row % 2 ? COLORS.seat : COLORS.stand} roughness={0.9} />
         </mesh>
       ))}
-      {people.map((p, i) => (
-        <mesh key={i} position={[p.x, 1.1 + p.row * 0.8, side * p.row * 1.1]}>
-          <boxGeometry args={[0.45, 0.6, 0.35]} />
-          <meshStandardMaterial color={p.color} roughness={0.8} />
-        </mesh>
-      ))}
+      <Crowd people={people} side={side} />
     </group>
+  )
+}
+
+// The people in the stands: a seated body and a head each, all drawn at once (two instanced
+// meshes for the whole side, however many fans there are)
+const FAN_HEADS = ['#e0aa82', '#c98b5e', '#8d5a3b', '#f2c9a7', '#2b2622', '#5b3a24']
+function Crowd({
+  people,
+  side,
+}: {
+  people: { x: number; row: number; color: string }[]
+  side: -1 | 1
+}) {
+  const bodies = useRef<InstancedMesh>(null)
+  const heads = useRef<InstancedMesh>(null)
+  useLayoutEffect(() => {
+    const b = bodies.current
+    const h = heads.current
+    if (!b || !h) return
+    const at = new Matrix4()
+    const tint = new Color()
+    people.forEach((p, i) => {
+      const y = 1.05 + p.row * 0.8 // sitting on the step
+      const z = side * p.row * 1.1
+      b.setMatrixAt(i, at.makeTranslation(p.x, y, z))
+      b.setColorAt(i, tint.set(p.color))
+      h.setMatrixAt(i, at.makeTranslation(p.x, y + 0.38, z))
+      h.setColorAt(i, tint.set(FAN_HEADS[(i * 7 + p.row) % FAN_HEADS.length]))
+    })
+    for (const m of [b, h]) {
+      m.instanceMatrix.needsUpdate = true
+      if (m.instanceColor) m.instanceColor.needsUpdate = true
+    }
+  }, [people, side])
+  return (
+    <>
+      <instancedMesh ref={bodies} args={[SHAPES.fan, undefined, people.length]}>
+        <meshStandardMaterial roughness={0.8} />
+      </instancedMesh>
+      <instancedMesh ref={heads} args={[SHAPES.fanHead, undefined, people.length]}>
+        <meshStandardMaterial roughness={0.7} />
+      </instancedMesh>
+    </>
   )
 }
 

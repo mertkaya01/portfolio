@@ -1,10 +1,11 @@
-import { AnimatePresence, m, useReducedMotion, type Variants } from 'motion/react'
+import { AnimatePresence, m, useReducedMotion } from 'motion/react'
 import {
   lazy,
   Suspense,
   useCallback,
   useEffect,
   useRef,
+  useState,
   type MouseEvent,
   type SyntheticEvent,
 } from 'react'
@@ -19,6 +20,9 @@ import { FinalePlaceholder } from '../finale/FinalePlaceholder'
 
 import { questChapters } from './chapters'
 import { ControlsBar } from './ControlsBar'
+import { finaleSwing, isInteractive } from './finaleInput'
+import { arrivalFor, SET_LAYER, type Arrival } from './transitions'
+import { useQuestClock } from './questClock'
 import { ScoreboardHUD } from './ScoreboardHUD'
 import { SetScene } from './SetScene'
 import { stepDuration, stepOf, stepsIn } from './steps'
@@ -43,17 +47,6 @@ function announcement(state: ExperienceState, chapters: Chapter[], t: Messages) 
     : step.scene.caption
 }
 
-// Moving between sets: the new set slides in from the side you are heading to, the old one
-// slides out the other way, both fading. `direction` (1 = Next, -1 = Back) is passed in as
-// "custom", so the same variants work both ways. With reduced motion the stage passes 0
-// instead: no movement at all, only the fade.
-const SLIDE: Variants = {
-  enter: (direction: number) => ({ x: `${direction * 6}%`, opacity: 0 }),
-  center: { x: '0%', opacity: 1 },
-  exit: (direction: number) => ({ x: `${direction * -6}%`, opacity: 0 }),
-}
-const SLIDE_TRANSITION = { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const } // ease-out-expo
-
 // The full-screen stage the quest is played on. It is a native <dialog> opened as a modal:
 // the browser then makes the page behind it inert (no focus, no clicks, hidden from screen
 // readers) — a focus trap for free. It stays open through the transition, then disappears.
@@ -63,8 +56,7 @@ export function QuestStage() {
   const send = useExperience((s) => s.send)
   const t = useT()
   const { chapters } = useContent() // the sets' text in the current language
-  // reduced motion: the sets cross-fade in place (0 = no slide)
-  const slide = useReducedMotion() ? 0 : direction
+  const calm = useReducedMotion() ?? false
   const dialogRef = useRef<HTMLDialogElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
 
@@ -101,15 +93,38 @@ export function QuestStage() {
   const step = state.name === 'QUEST' ? state.beat : 0
   const chapter = chapterIndex >= 0 ? chapters[chapterIndex] : undefined
 
+  // How the set on stage came on (transitions.ts) — worked out the moment the set changes, from
+  // the set before it: forwards, each boundary in the style of the set coming in; backwards (or
+  // with less motion asked for), a crossfade. The finale counts as one past the last set.
+  const setIndex = chapterIndex >= 0 ? chapterIndex : questChapters.length
+  const layerKey = current?.id ?? 'finale'
+  const [arrival, setArrival] = useState<{ key: string; index: number; kind: Arrival }>({
+    key: layerKey,
+    index: setIndex,
+    kind: 'fade',
+  })
+  if (arrival.key !== layerKey) {
+    setArrival({
+      key: layerKey,
+      index: setIndex,
+      kind: arrivalFor(arrival.index, setIndex, direction, calm),
+    })
+  }
+
   // The quest plays by itself: every step stays for its time, then Next
   const stepKey = `${chapterIndex}.${step}`
   const duration = chapter ? stepDuration(stepOf(chapter, step), current?.scoreboardMs) : 0
+  // a scene being played with (the suitcase, a photo) holds the clock
+  const held = useQuestClock((s) => s.holds.length > 0)
   const autoplay = useAutoplay({
     stepKey,
     duration,
-    active: state.name === 'QUEST',
+    active: state.name === 'QUEST' && !held,
     onDone: () => send({ type: 'NEXT' }),
   })
+  useEffect(() => {
+    useQuestClock.getState().setPlaying(autoplay.playing)
+  }, [autoplay.playing])
   useQuestInput({ onTogglePlay: autoplay.toggle })
 
   const swipe = useSwipe((direction) => (direction === 'left' ? next() : prev()))
@@ -117,13 +132,19 @@ export function QuestStage() {
   // A click or tap anywhere on the scene moves on (in the finale: spikes)
   function onSceneClick(e: MouseEvent) {
     if (swipe.justSwiped() || (e.target as Element).closest('button, a')) return
+    if (isInteractive(e.target)) return // the visitor is playing with the scene
     if (window.getSelection()?.toString()) return // the visitor is selecting text
-    if (state.name === 'FINALE') spike()
-    else next()
+    if (state.name === 'FINALE') {
+      // the 3D match point takes its own taps (where you tap is where you aim)
+      if (!finaleSwing()) spike()
+    } else next()
   }
 
   // Android's back gesture asks the dialog to close: treat it like Skip
+  // (React passes a photo dialog's cancel up its tree to this one too: only our own counts —
+  // Esc on an open photo closes the photo, not the quest)
   function onCancel(e: SyntheticEvent) {
+    if (e.target !== e.currentTarget) return
     e.preventDefault()
     skip()
   }
@@ -161,18 +182,18 @@ export function QuestStage() {
             <ScoreboardHUD state={state} onSkip={skip} />
 
             <div onClick={onSceneClick} className="relative min-h-0 flex-1 overflow-hidden">
-              {/* AnimatePresence keeps the leaving set on screen until its exit has played.
-                  key = the set: changing lines inside a set doesn't slide, changing sets does.
-                  initial={false}: the first set doesn't slide in (the stage fades in instead). */}
-              <AnimatePresence initial={false} custom={slide}>
+              {/* AnimatePresence keeps the leaving set on stage until its exit has played.
+                  key = the set: changing lines inside a set changes nothing here, changing sets
+                  plays the hand-over between their styles (transitions.ts).
+                  initial={false}: the first set doesn't come in (the stage fades in instead). */}
+              <AnimatePresence initial={false} custom={arrival.kind}>
                 <m.div
-                  key={current?.id ?? 'finale'}
-                  custom={slide}
-                  variants={SLIDE}
+                  key={layerKey}
+                  custom={arrival.kind}
+                  variants={SET_LAYER}
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={SLIDE_TRANSITION}
                   // bg-night: while a set fades it is mixed on its own, and the grain inside needs
                   // the dark behind it in that same layer (or it shows as grey noise everywhere)
                   className="absolute inset-0 bg-night"
@@ -184,6 +205,7 @@ export function QuestStage() {
                       Art={current.Art}
                       layout={current.layout}
                       ownScoreboard={current.ownScoreboard}
+                      arrival={arrival.kind}
                     />
                   ) : (
                     <Suspense fallback={<FinalePlaceholder onSpike={spike} />}>

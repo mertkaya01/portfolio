@@ -3,6 +3,8 @@ import { useEffect, useRef } from 'react'
 import { useExperience } from '@/app/experienceStore'
 import { handlesOwnKeys, hasModifier } from '@/lib/keyboard'
 
+import { finaleSwing, isSwingKey } from './finaleInput'
+
 const NEXT_KEYS = new Set(['Enter', 'ArrowRight', 'PageDown'])
 const PREV_KEYS = new Set(['ArrowLeft', 'Backspace', 'PageUp'])
 const SKIP_KEYS = new Set(['Escape', 's', 'S'])
@@ -19,6 +21,9 @@ export function useQuestInput({ onTogglePlay }: { onTogglePlay: () => void }) {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (hasModifier(e)) return
+      // while a photo is open over the quest, the keys are the photo's (Esc closes the photo,
+      // not the quest) — wherever the focus happens to be
+      if (document.querySelector('dialog[data-quest-photo][open]')) return
       // Read the store at the moment of the key press, so the listener is set up only once
       const { state, send } = useExperience.getState()
 
@@ -30,6 +35,15 @@ export function useQuestInput({ onTogglePlay }: { onTogglePlay: () => void }) {
       }
       if (PLAY_KEYS.has(e.key)) {
         if (!e.repeat && state.name === 'QUEST') togglePlay.current()
+        return
+      }
+
+      // the 3D match point: its own swing keys (← → aim there instead of going back)
+      const swingAt = state.name === 'FINALE' ? finaleSwing() : null
+      if (swingAt && isSwingKey(e.key)) {
+        if ((e.key === 'Enter' || e.key === ' ') && handlesOwnKeys(e.target)) return
+        e.preventDefault()
+        if (!e.repeat) swingAt(e.key, e.timeStamp)
         return
       }
 

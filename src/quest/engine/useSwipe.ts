@@ -1,5 +1,7 @@
 import { useRef, type TouchEvent } from 'react'
 
+import { isInteractive } from './finaleInput'
+
 const MIN_DISTANCE = 50 // px
 
 // Swipe left / right on a touch screen. A swipe has to be clearly sideways and long enough,
@@ -10,6 +12,11 @@ export function useSwipe(onSwipe: (direction: 'left' | 'right') => void) {
 
   return {
     onTouchStart(e: TouchEvent) {
+      // dragging something in the scene (the suitcase) is not a swipe
+      if (isInteractive(e.target)) {
+        start.current = null
+        return
+      }
       const touch = e.touches[0]
       start.current = { x: touch.clientX, y: touch.clientY }
     },

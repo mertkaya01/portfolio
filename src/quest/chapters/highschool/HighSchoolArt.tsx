@@ -11,6 +11,7 @@ import { busShot } from './bus'
 import { classShot } from './class'
 import { courtShot } from './court'
 import { pendingShot } from './pending'
+import { light, prepareLighting } from './lighting'
 import { blitFrame, C, createBuffer, dissolve, fromBytes, FULL, type Buffer } from './pixel'
 import { nightShot, wakeShot } from './room'
 import { scoreboardShot } from './scoreboard'
@@ -94,6 +95,7 @@ function compose(out: Buffer, shot: Shot, t: number, ctx: ShotContext) {
     )
   }
   shot.over?.(out, t, ctx)
+  if (shot.lighting) light(out, shot.lighting, t)
 }
 
 export default function HighSchoolArt({ chapter, scene }: ArtProps) {
@@ -127,6 +129,7 @@ export default function HighSchoolArt({ chapter, scene }: ArtProps) {
       shot.sheets?.forEach((s) => load(s.src))
     }
     const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    prepareLighting() // the light's colour tables, made in idle moments from now on
 
     const frame = createBuffer(FULL.w, FULL.h) // the shot as it should look now
     const shown = createBuffer(FULL.w, FULL.h) // what is on screen (differs during a dissolve)
@@ -190,7 +193,8 @@ export default function HighSchoolArt({ chapter, scene }: ArtProps) {
           : Math.max(
               1,
               Math.floor(
-                Math.min((box.clientWidth * dpr) / FULL.w, (box.clientHeight * dpr) / FULL.h),
+                Math.min((box.clientWidth * dpr) / FULL.w, (box.clientHeight * dpr) / FULL.h) +
+                  1e-6, // the screen is an exact multiple; a float may land a hair under it
               ),
             )
       const width = (FULL.w * scale) / dpr

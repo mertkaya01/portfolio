@@ -1,4 +1,16 @@
+import type { CSSProperties } from 'react'
+
 import { FLAT, type Look } from './flat'
+
+// The light comes from the top left (as everywhere in the chapter), so every figure carries a
+// flat shade on its right side: the same shape, a cool violet, see-through — hue-shifted
+// shadow, never black. And everyone breathes, very slightly, each at their own moment.
+const SHADE = '#2b2f6b'
+const breathe = (x: number): CSSProperties => ({
+  transformBox: 'fill-box',
+  transformOrigin: 'bottom',
+  animation: `flat-breathe 3.6s ease-in-out ${-((x * 37) % 3600)}ms infinite`,
+})
 
 // Flat vector people for Set 4: no outlines and no faces — a round head, hair as one shape, a
 // body, legs. Mert is the one with his long dark hair tied back and the white jacket, as in his
@@ -11,21 +23,25 @@ export function Standing({ x, y, look }: { x: number; y: number; look: Look }) {
       {/* legs */}
       <rect x={-5} y={-16} width={4.4} height={16} rx={2} fill={look.legs ?? FLAT.navy} />
       <rect x={0.6} y={-16} width={4.4} height={16} rx={2} fill={look.legs ?? FLAT.navy} />
-      {/* a puffy jacket: body and arm */}
-      <rect x={-7.5} y={-31} width={15} height={17} rx={5} fill={look.top} />
-      <rect x={-7.5} y={-24} width={15} height={1.2} fill="black" opacity={0.06} />
-      <rect x={-7.5} y={-19} width={15} height={1.2} fill="black" opacity={0.06} />
-      <rect
-        x={1.5}
-        y={-29}
-        width={5}
-        height={13}
-        rx={2.5}
-        fill={look.top}
-        stroke="black"
-        strokeOpacity={0.08}
-      />
-      <Head x={1} y={-36} look={look} facing="side" />
+      <rect x={0.6} y={-16} width={4.4} height={16} rx={2} fill={SHADE} opacity={0.18} />
+      <g style={breathe(x)}>
+        {/* a puffy jacket: body and arm */}
+        <rect x={-7.5} y={-31} width={15} height={17} rx={5} fill={look.top} />
+        <rect x={1.5} y={-31} width={6} height={17} rx={4} fill={SHADE} opacity={0.12} />
+        <rect x={-7.5} y={-24} width={15} height={1.2} fill="black" opacity={0.06} />
+        <rect x={-7.5} y={-19} width={15} height={1.2} fill="black" opacity={0.06} />
+        <rect
+          x={1.5}
+          y={-29}
+          width={5}
+          height={13}
+          rx={2.5}
+          fill={look.top}
+          stroke="black"
+          strokeOpacity={0.08}
+        />
+        <Head x={1} y={-36} look={look} facing="side" />
+      </g>
     </g>
   )
 }
@@ -34,8 +50,11 @@ export function Standing({ x, y, look }: { x: number; y: number; look: Look }) {
 export function SeatedBack({ x, y, look }: { x: number; y: number; look: Look }) {
   return (
     <g transform={`translate(${x} ${y})`}>
-      <rect x={-9} y={-8} width={18} height={14} rx={6} fill={look.top} />
-      <Head x={0} y={-13} look={look} facing="back" />
+      <g style={breathe(x)}>
+        <rect x={-9} y={-8} width={18} height={14} rx={6} fill={look.top} />
+        <rect x={1} y={-8} width={8} height={14} rx={5} fill={SHADE} opacity={0.12} />
+        <Head x={0} y={-13} look={look} facing="back" />
+      </g>
     </g>
   )
 }
@@ -44,8 +63,11 @@ export function SeatedBack({ x, y, look }: { x: number; y: number; look: Look })
 export function SeatedFront({ x, y, look }: { x: number; y: number; look: Look }) {
   return (
     <g transform={`translate(${x} ${y})`}>
-      <rect x={-9} y={-8} width={18} height={14} rx={6} fill={look.top} />
-      <Head x={0} y={-13} look={look} facing="front" />
+      <g style={breathe(x + 11)}>
+        <rect x={-9} y={-8} width={18} height={14} rx={6} fill={look.top} />
+        <rect x={1} y={-8} width={8} height={14} rx={5} fill={SHADE} opacity={0.12} />
+        <Head x={0} y={-13} look={look} facing="front" />
+      </g>
     </g>
   )
 }

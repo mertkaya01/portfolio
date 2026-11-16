@@ -1,16 +1,22 @@
-import type { ReactNode } from 'react'
+import { useId, useMemo, type ReactNode } from 'react'
 
 import { LineDraw } from '../../scene-kit/LineDraw'
 
-import { HAND, INK } from './pencil'
+import { HAND, INK, pencilLine } from './pencil'
 
 // The pencil-sketch kit of Set 2. Everything is SVG in a 320 × 180 box (the same frame as
 // Set 1's pixel art), so it stays sharp at any size:
-// - strokes wobble a little, like a hand drew them, and draw themselves (LineDraw)
-// - a pencil filter roughens every line, a paper texture sits under it all
+// - strokes are pencil lines: pressure, tapered ends, a guide stroke under them; they draw
+//   themselves (LineDraw, as a mask)
+// - a pencil filter roughens every line and lets the paper's grain through; a notebook page
+//   sits under it all
 // - handwriting (Caveat) appears as if it were being written, left to right
 
-// Several strokes drawn one after the other, starting at `delay` ms
+// Several strokes drawn one after the other, starting at `delay` ms. Each is a real pencil
+// line (pencilLine in pencil.ts): it starts thin, swells with the pressure, tapers off at the
+// end, and has a faint guide stroke under it that overshoots the ends — the way a hand finds a
+// line before committing to it. It still draws itself: the line is revealed through a mask
+// that draws along its middle.
 export function Strokes({
   paths,
   delay = 0,
@@ -25,11 +31,75 @@ export function Strokes({
   color?: string
 }) {
   return (
-    <g fill="none" stroke={color} strokeWidth={width}>
+    <g style={{ mixBlendMode: 'multiply' }}>
       {paths.map((d, i) => (
-        <LineDraw key={i} d={d} delay={delay + i * each * 0.6} duration={each} />
+        <PencilStroke
+          key={i}
+          d={d}
+          delay={delay + i * each * 0.6}
+          duration={each}
+          size={width * 2.2}
+          seed={i * 7 + d.length}
+          color={color}
+        />
       ))}
     </g>
+  )
+}
+
+function PencilStroke({
+  d,
+  delay,
+  duration,
+  size,
+  seed,
+  color,
+}: {
+  d: string
+  delay: number
+  duration: number
+  size: number
+  seed: number
+  color: string
+}) {
+  const id = useId()
+  const line = useMemo(() => pencilLine(d, size, seed), [d, size, seed])
+  if (!line) {
+    // (no browser geometry to measure with: a plain line, as before)
+    return (
+      <LineDraw
+        d={d}
+        fill="none"
+        stroke={color}
+        strokeWidth={size / 2.2}
+        delay={delay}
+        duration={duration}
+      />
+    )
+  }
+  return (
+    <>
+      <LineDraw
+        d={line.guide}
+        fill="none"
+        stroke={color}
+        strokeWidth={size * 0.22}
+        opacity={0.32}
+        delay={Math.max(0, delay - duration * 0.4)}
+        duration={duration * 0.8}
+      />
+      <mask id={id} maskUnits="userSpaceOnUse">
+        <LineDraw
+          d={d}
+          fill="none"
+          stroke="white"
+          strokeWidth={size * 3}
+          delay={delay}
+          duration={duration}
+        />
+      </mask>
+      <path d={line.outline} fill={color} mask={`url(#${id})`} />
+    </>
   )
 }
 
@@ -97,10 +167,25 @@ export function Written({
 export function SketchDefs() {
   return (
     <defs>
-      {/* graphite: lines shiver a little and get a grainy edge */}
+      {/* graphite: lines shiver a little, and the grain of the paper shows through them —
+          graphite sticks to the paper's tooth and skips its hollows, so a pencil line is never
+          one flat colour */}
       <filter id="sketch-pencil" x="-5%" y="-5%" width="110%" height="110%">
         <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="3" result="n" />
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="1.1" />
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="0.9" result="drawn" />
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="1.5"
+          numOctaves="1"
+          seed="11"
+          result="tooth"
+        />
+        <feColorMatrix
+          in="tooth"
+          values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.2 0 0 0 2.05"
+          result="holds"
+        />
+        <feComposite in="drawn" in2="holds" operator="in" />
       </filter>
       {/* paper grain: faint noise over the paper colour */}
       <filter id="sketch-grain">
@@ -111,10 +196,20 @@ export function SketchDefs() {
   )
 }
 
-export function Paper({ tint = INK.paper }: { tint?: string }) {
+// The page: warm off-white with a faint grain — a student's notebook page, its pale blue
+// rules and red margin line barely there under the drawing
+export function Paper({ tint = INK.paper, ruled = true }: { tint?: string; ruled?: boolean }) {
   return (
     <>
       <rect width="320" height="180" fill={tint} />
+      {ruled && (
+        <g opacity={0.5}>
+          {Array.from({ length: 19 }, (_, i) => (
+            <path key={i} d={`M0 ${10 + i * 9} H320`} stroke="#9fb7d6" strokeWidth={0.3} />
+          ))}
+          <path d="M34 0 V180" stroke="#d98a8a" strokeWidth={0.4} />
+        </g>
+      )}
       <rect width="320" height="180" filter="url(#sketch-grain)" />
     </>
   )

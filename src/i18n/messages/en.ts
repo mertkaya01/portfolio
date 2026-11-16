@@ -180,7 +180,7 @@ export const en = {
     pause: 'Pause',
     play: 'Play',
     moveHint: '← → or swipe',
-    spikeHint: 'Space, click or tap to spike',
+    spikeHint: 'Spike when the ring closes on the ball',
     spikeHintTouch: 'Tap to spike',
     announceSet: (set: number, title: string, period: string) => `Set ${set}, ${title}, ${period}.`,
     // what a screen reader hears for a scoreboard drawn as a picture
@@ -196,12 +196,44 @@ export const en = {
       `ASCII art: a terminal prints the scoreboard — Set ${set}, ${title}, ${period}.`,
     sketchScoreboard: (set: number, title: string, period: string) =>
       `Pencil sketch: a scoreboard drawn by hand — Set ${set}, ${title}, ${period}.`,
-    announceFinale: 'Match point. Press Space, click or tap to spike.',
+    announceFinale:
+      'Match point. The setter puts the ball up: press Space when the ring closes on it — the arrow keys aim left or right.',
     finale: {
       kicker: 'Set 5 · Tie-break',
       title: 'Match point',
       text: 'One ball left. Spike it — and the portfolio opens.',
       spike: 'Spike it',
+      hintKeys: 'Space when the ring closes on the ball · ← → to aim',
+      hintTouch: 'Tap when the ring closes — on the open side',
+      words: {
+        kill: 'Kill!',
+        blockout: 'Off the block!',
+        blocked: 'Blocked!',
+        net: 'Into the net',
+        out: 'Out!',
+        miss: 'Missed it',
+      },
+      perfect: 'Perfect timing',
+      point: 'Point — and the match',
+      again: 'One more ball',
+      last: 'Last ball — Mert takes this one',
+    },
+    graduationBanner: 'Class of 2026', // the banner over the stage (Set 5)
+    journey: {
+      hint: 'Drag the suitcase to Brandenburg — or tap it',
+      travel: 'Travel from Istanbul to Brandenburg an der Havel',
+      arrived: 'Arrived in Brandenburg an der Havel',
+      stamp: 'Brandenburg an der Havel',
+    },
+    photos: {
+      bridge: 'On the bridge over the Havel',
+      museum: 'At the Industrial Museum, Brandenburg an der Havel',
+      river: 'Sunset on the Havel',
+      campus: 'The campus, from my dorm window',
+      open: (label: string) => `Photo: ${label}`,
+      close: 'Close',
+      missing: (id: string) =>
+        `Photo to come — add it as src/quest/chapters/erasmus/photos/${id}.jpg`,
     },
     art: {
       label: 'Set art',

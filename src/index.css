@@ -45,6 +45,14 @@
   --animate-burst-glow: burst-glow 1.3s var(--ease-out-expo) both;
   --animate-spark: spark 1s var(--ease-out-expo) both;
   --animate-twinkle: twinkle 6s ease-in-out infinite;
+  /* a new set arriving on the quest's screen (engine/transitions.ts) */
+  --animate-arrive-late: arrive-late 0.42s steps(1, end) both; /* under the pixel blocks */
+  --animate-arrive-scan: arrive-scan 0.9s linear both; /* wiped in under the scan line */
+  --animate-arrive-dot: arrive-dot 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both;
+  --animate-scan-beam: scan-beam 0.9s linear both;
+  --animate-power-dot: power-dot 1.15s ease-out both;
+  --animate-crt-flicker: crt-flicker 3.1s steps(1, end) infinite; /* the phosphor, barely */
+  --animate-hit-word: hit-word 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) both; /* the spike's words */
 
   /* Arena lights warming up: a couple of flickers, then steady */
   @keyframes light-on {
@@ -301,6 +309,120 @@
     }
   }
 
+  /* The new set's picture: hidden until the pixel blocks cover the old one */
+  @keyframes arrive-late {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* … revealed from the top down, following the scan line */
+  @keyframes arrive-scan {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  /* … opening out of the dot the old CRT left */
+  @keyframes arrive-dot {
+    from {
+      clip-path: circle(0% at 50% 50%);
+    }
+    to {
+      clip-path: circle(75% at 50% 50%);
+    }
+  }
+
+  @keyframes scan-beam {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    92% {
+      opacity: 1;
+    }
+    to {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+
+  /* the CRT's last dot: flashes up as the line collapses, then fades as the picture opens */
+  @keyframes power-dot {
+    0%,
+    40% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.3);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.2);
+      opacity: 0;
+    }
+  }
+
+  /* an amber CRT's phosphor: a breath under 2 % now and then, never a strobe */
+  @keyframes crt-flicker {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    23% {
+      opacity: 0.985;
+    }
+    24% {
+      opacity: 1;
+    }
+    61% {
+      opacity: 0.99;
+    }
+    62% {
+      opacity: 1;
+    }
+    83% {
+      opacity: 0.982;
+    }
+    84% {
+      opacity: 1;
+    }
+  }
+
+  /* flat people breathing: barely, from the feet up */
+  @keyframes flat-breathe {
+    0%,
+    100% {
+      transform: scale(1, 1);
+    }
+    50% {
+      transform: scale(1.01, 1.025);
+    }
+  }
+
+  /* KILL! / BLOK! — the word slams in, a little tilted, like lettering in a comic */
+  @keyframes hit-word {
+    0% {
+      opacity: 0;
+      transform: scale(1.9) rotate(-9deg);
+    }
+    45% {
+      opacity: 1;
+      transform: scale(0.94) rotate(-4deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(-5deg);
+    }
+  }
+
   @keyframes breathe {
     0%,
     100% {
@@ -423,6 +545,18 @@
 }
 
 /* A flat shape popping in (Set 4's vector scenes): from nothing to a little too big, to its size */
+/* A spot you can tap: a ring swells and fades (a few times, then it rests) */
+@keyframes hotspot-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(2.3);
+    opacity: 0;
+  }
+}
+
 @keyframes pop-in {
   0% {
     transform: scale(0);

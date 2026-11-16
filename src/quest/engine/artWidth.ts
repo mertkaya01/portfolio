@@ -32,3 +32,39 @@ export function useFit16x9(box: RefObject<HTMLElement | null>) {
   }, [box])
   return phone
 }
+
+// The size of the quest's one screen (ArtScreen) inside a box: a whole number of the pixel
+// art's 320 × 180, counted in device pixels — what Set 1 needs for square, sharp pixels — and
+// the other sets fill the same box. On phones: the box's full width and height (each set
+// shows its middle).
+const FULL = { w: 320, h: 180 }
+
+export function useScreenSize(box: RefObject<HTMLElement | null>) {
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null)
+  useEffect(() => {
+    const el = box.current
+    if (!el) return
+    const fit = () => {
+      const width = el.clientWidth
+      const height = el.clientHeight
+      if (width < PHONE_BELOW) {
+        setSize({ w: width, h: height })
+        setArtWidth(el, width)
+        return
+      }
+      const dpr = window.devicePixelRatio || 1
+      const scale = Math.max(
+        1,
+        Math.floor(Math.min((width * dpr) / FULL.w, (height * dpr) / FULL.h) + 1e-6),
+      )
+      const w = (FULL.w * scale) / dpr
+      setSize({ w, h: (FULL.h * scale) / dpr })
+      setArtWidth(el, w) // the caption lines up with the screen's left edge
+    }
+    fit()
+    const observer = new ResizeObserver(fit)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [box])
+  return size
+}

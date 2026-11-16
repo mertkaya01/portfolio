@@ -1,5 +1,7 @@
 import type { CSSProperties } from 'react'
 
+import { QUEST } from '../../engine/palette'
+
 // Set 4's flat vector look: clean shapes, flat colours, no outlines, soft shadows. Everything is
 // SVG in a 320 × 180 box (like the other sets), sharp at any size. Phones keep x 70–249.
 export const FLAT = {
@@ -16,7 +18,7 @@ export const FLAT = {
   stone: '#e9e1d3',
   navy: '#1f2a44',
   euBlue: '#1f4fb5',
-  star: '#ffd23f', // the site's accent — and the stars of the EU flag
+  star: QUEST.accent, // the quest's accent — and the stars of the EU flag
   white: '#ffffff',
   ink: '#1b1f2a',
   grey: '#9aa5b1',
@@ -43,6 +45,13 @@ export const grow = (delay: number, ms = 600): CSSProperties => ({
   transformBox: 'fill-box',
   transformOrigin: 'bottom',
   animation: `grow-y ${ms}ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms both`,
+})
+
+// a ring that swells and fades around something to tap — a few times, then it rests
+export const pulse = (delay: number, times = 3): CSSProperties => ({
+  transformBox: 'fill-box',
+  transformOrigin: 'center',
+  animation: `hotspot-pulse 1.4s ease-out ${delay}ms ${times} both`,
 })
 
 // How a flat person looks (people.tsx draws them)

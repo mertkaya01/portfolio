@@ -1,5 +1,11 @@
 import type { ThreeElements } from '@react-three/fiber'
 
+import { QUEST } from '../../engine/palette'
+
+import { COLORS } from './colors'
+import { BODY, SHAPES } from './figure'
+import { FloorShadow } from './lights'
+
 // Small 3D props for Set 5: the volleyball, faceless team-mates, and the three things Mert built
 // in his internship (a hotel, a shopping bag for the marketplace, a chat bubble for the bots).
 
@@ -9,7 +15,7 @@ export function Ball(props: ThreeElements['group']) {
     <group {...props}>
       <mesh>
         <sphereGeometry args={[0.12, 16, 12]} />
-        <meshStandardMaterial color="#ffd23f" roughness={0.5} />
+        <meshStandardMaterial color={QUEST.accent} roughness={0.5} />
       </mesh>
       {[0, Math.PI / 2].map((r) => (
         <mesh key={r} rotation-y={r}>
@@ -21,22 +27,123 @@ export function Ball(props: ThreeElements['group']) {
   )
 }
 
-// A player with no face: a body in their kit and a head — for team-mates and the other team
-export function Player({ color, ...props }: { color: string } & ThreeElements['group']) {
+// A person with no face, built like Mert (figure.ts) — team-mates and the other team in kit
+// (shorts, bare arms and legs), graduates in gowns, colleagues in everyday clothes (long
+// sleeves, trousers). Standing or sitting (on a seat about 0.5 m high). Arms hang at the sides,
+// go up (a cheer), forward (on a table) — or, with `block`, up over the head with the hands
+// open: a blocker at the net. A soft shadow under the feet — `shadow={false}` when the scene
+// lifts the player (a jump) and draws its own.
+const PLAYER_SKIN = '#d6a27c'
+const SEAT_DROP = 0.34
+export function Player({
+  color,
+  block = false,
+  shadow = true,
+  hair = '#2b2622',
+  gown = false,
+  casual = false,
+  legs = '#2a3550',
+  sit = false,
+  arms,
+  skin = PLAYER_SKIN,
+  ...props
+}: {
+  color: string
+  block?: boolean
+  shadow?: boolean
+  hair?: string
+  gown?: boolean // a graduate: the gown over dark clothes (`color` is then the stole)
+  casual?: boolean // everyday clothes: `color` is the top (long sleeves), `legs` the trousers
+  legs?: string
+  sit?: boolean
+  arms?: 'down' | 'up' | 'forward'
+  skin?: string
+} & ThreeElements['group']) {
+  const armAngle = block ? Math.PI * 0.93 : arms === 'up' ? Math.PI * 0.82 : 0.1
+  // forward: on a table — sitting, the hands come down onto it
+  const armForward = arms === 'forward' ? (sit ? -0.85 : -1.1) : 0
+  const body = gown ? COLORS.gown : color
+  const legColor = gown ? '#2a2f3a' : casual ? legs : skin
+  const armColor = gown ? COLORS.gown : casual ? color : skin
   return (
     <group {...props}>
-      <mesh position={[0, 0.45, 0]}>
-        <boxGeometry args={[0.36, 0.9, 0.22]} />
-        <meshStandardMaterial color="#d6a27c" roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 1.2, 0]}>
-        <boxGeometry args={[0.5, 0.66, 0.28]} />
-        <meshStandardMaterial color={color} roughness={0.7} />
-      </mesh>
-      <mesh position={[0, 1.82, 0]}>
-        <boxGeometry args={[0.3, 0.32, 0.3]} />
-        <meshStandardMaterial color="#2b2622" roughness={0.9} />
-      </mesh>
+      {shadow && <FloorShadow size={1.1} />}
+      {[-BODY.legX, BODY.legX].map((x) =>
+        sit ? (
+          <group key={x}>
+            <mesh geometry={SHAPES.thigh} position={[x, 0.52, 0.2]} rotation-x={Math.PI / 2}>
+              <meshStandardMaterial color={legColor} roughness={0.75} />
+            </mesh>
+            <mesh geometry={SHAPES.shin} position={[x, 0.28, 0.4]}>
+              <meshStandardMaterial color={legColor} roughness={0.75} />
+            </mesh>
+            <mesh geometry={SHAPES.shoe} position={[x, 0.045, 0.46]}>
+              <meshStandardMaterial color="#e9e4da" roughness={0.6} />
+            </mesh>
+          </group>
+        ) : (
+          <group key={x}>
+            <mesh geometry={SHAPES.shoe} position={[x, 0.045, 0.04]}>
+              <meshStandardMaterial color="#e9e4da" roughness={0.6} />
+            </mesh>
+            <mesh geometry={SHAPES.leg} position={[x, BODY.legY, 0]}>
+              <meshStandardMaterial color={legColor} roughness={0.65} />
+            </mesh>
+          </group>
+        ),
+      )}
+      <group position-y={sit ? -SEAT_DROP : 0}>
+        <mesh geometry={SHAPES.hips} position={[0, BODY.hipsY, 0]}>
+          <meshStandardMaterial color={casual ? legs : body} roughness={0.7} />
+        </mesh>
+        <mesh geometry={SHAPES.torso} position={[0, BODY.torsoY, 0]}>
+          <meshStandardMaterial color={body} roughness={0.6} />
+        </mesh>
+        {gown && (
+          <>
+            <mesh geometry={SHAPES.robe} position={[0, 0.98, 0]}>
+              <meshStandardMaterial color={COLORS.gown} roughness={0.7} />
+            </mesh>
+            {[-0.1, 0.1].map((x) => (
+              <mesh key={x} position={[x, 1.22, 0.163]}>
+                <planeGeometry args={[0.07, 0.6]} />
+                <meshStandardMaterial color={color} roughness={0.6} />
+              </mesh>
+            ))}
+          </>
+        )}
+        {[-1, 1].map((side) => (
+          <group
+            key={side}
+            position={[side * BODY.shoulder.x, BODY.shoulder.y, 0]}
+            rotation={[armForward, 0, side * (armForward ? 0.08 : armAngle)]}
+          >
+            {!gown && !casual && (
+              <mesh geometry={SHAPES.sleeve} position={[0, -0.08, 0]}>
+                <meshStandardMaterial color={color} roughness={0.6} />
+              </mesh>
+            )}
+            <mesh geometry={gown ? SHAPES.robeSleeve : SHAPES.arm} position={[0, BODY.armY, 0]}>
+              <meshStandardMaterial color={armColor} roughness={0.65} />
+            </mesh>
+            <mesh geometry={SHAPES.hand} position={[0, BODY.handY, 0]}>
+              <meshStandardMaterial color={skin} roughness={0.65} />
+            </mesh>
+          </group>
+        ))}
+        <mesh geometry={SHAPES.neck} position={[0, BODY.neckY, 0]}>
+          <meshStandardMaterial color={skin} roughness={0.65} />
+        </mesh>
+        <mesh geometry={SHAPES.head} position={[0, BODY.headY, 0]}>
+          <meshStandardMaterial color={skin} roughness={0.6} />
+        </mesh>
+        <mesh geometry={SHAPES.hairTop} position={[0, 1.985, -0.012]}>
+          <meshStandardMaterial color={hair} roughness={0.85} />
+        </mesh>
+        <mesh geometry={SHAPES.hairBack} position={[0, 1.87, -0.125]}>
+          <meshStandardMaterial color={hair} roughness={0.85} />
+        </mesh>
+      </group>
     </group>
   )
 }

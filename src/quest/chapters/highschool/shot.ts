@@ -1,5 +1,6 @@
 import type { Locale } from '../../../i18n/locale'
 
+import type { Lighting } from './lighting'
 import type { Buffer } from './pixel'
 
 // One shot of Set 1 = one step of the set (its scoreboard, or a scene). Layers are drawn in
@@ -33,5 +34,6 @@ export type Shot = {
   under?: (b: Buffer, t: number, ctx: ShotContext) => void // t = seconds since it appeared
   sheets?: SheetLayer[]
   over?: (b: Buffer, t: number, ctx: ShotContext) => void
+  lighting?: Lighting // its light sources (lighting.ts), applied over everything
   still: number // the moment shown, frozen, to visitors who prefer less motion
 }

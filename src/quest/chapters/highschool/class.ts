@@ -196,5 +196,16 @@ export const classShot: Shot = {
   background: CLASS_BG,
   images: [MERT_SHEET],
   over: play,
+  // daylight through the windows on the left wall, fading across the room; the fluorescent
+  // tubes dip now and then
+  lighting: {
+    ambient: 0.86,
+    lights: [
+      { x: 40, y: 70, r: 115, power: 0.3 },
+      { x: 40, y: 115, r: 115, power: 0.3 },
+      { x: 40, y: 160, r: 115, power: 0.3 },
+    ],
+    flicker: 0.02,
+  },
   still: 2.2, // the deskmate leaning over
 }
