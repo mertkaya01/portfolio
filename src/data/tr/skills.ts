@@ -15,6 +15,7 @@ export const SKILL_TEXT: Record<string, GroupText> = {
     summary: 'Kod yazdığım diller — en çok Java ve TypeScript.',
     skills: {
       'C · C++': { detail: 'Başlangıç seviyesi' },
+      ABAP: { detail: 'Başlangıç seviyesi' },
       R: { detail: 'Başlangıç seviyesi' },
       Arduino: { detail: 'Gömülü sistemler dersi' },
     },

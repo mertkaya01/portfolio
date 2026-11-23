@@ -32,6 +32,7 @@ export const skillGroups: SkillGroup[] = [
         evidence: ['marketplace', 'hotel-commerce-service', 'data-analysis-engine'],
       },
       { name: 'C · C++', level: 'familiar', detail: 'Beginner level' },
+      { name: 'ABAP', level: 'familiar', detail: 'Beginner level' },
       { name: 'R', level: 'familiar', detail: 'Beginner level' },
       { name: 'Arduino', level: 'familiar', detail: 'Embedded systems coursework' },
     ],
